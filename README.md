@@ -1,12 +1,15 @@
 # Project Overview
 
-Implement a Kalman Filter from scratch for a simulated system (mobile robot, robotic manipulators, etc.) The implementation will use Eigen for matrix math.
+Implement a Kalman Filter from scratch for combining data from a 9-DoF IMU and a time-of-flight distance sensor 
+attached to the end-effector of a delta robot. The filter will be used to estimate the position and velocity of the 
+end-effector in 3D space.
 
-Implement the filter on some simulated system with a graphical interface to showcase the performance.
+Results will be visualized with a 3D plot, written in C++ and compared to kinematics estimations from the robot's control system.
 
-New concepts to learn:
+Learning Concepts:
 - Kalman Filtering
-- Eigen Library
+- Reading I2C data from high-speed sensors
+- Eigen Library (C++ Library for Linear Algebra and Matrices)
 - Graphics and Plotting in C++
 
 ## Resources
