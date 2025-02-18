@@ -1,7 +1,7 @@
 #ifndef ADAFRUIT_GENERICDEVICE_H
 #define ADAFRUIT_GENERICDEVICE_H
 
-#include <Arduino.h>
+// #include <Arduino.h>
 
 typedef bool (*busio_genericdevice_read_t)(void *obj, uint8_t *buffer,
                                            size_t len);
