@@ -1,14 +1,14 @@
 /**
- * @file i2c.cpp
+ * @file i2c.c
  * @author mdegans
  * @brief Open Source I2C Library for Linux
  * @version 0.1
  * @date 2025-02-18
- * 
+ *
  * https://github.com/amaork/libi2c/blob/master/src/i2c.c
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 
 #include <stdio.h>
@@ -20,7 +20,7 @@
 #include <arpa/inet.h>
 #include "include/kalman_filter/i2c.h"
 
-/* I2C default delay */
+ /* I2C default delay */
 #define I2C_DEFAULT_DELAY 1
 
 /* I2C internal address max length */
