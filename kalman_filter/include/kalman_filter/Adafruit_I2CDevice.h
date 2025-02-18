@@ -5,6 +5,7 @@
 // #include <Wire.h>
 
 #include <stdint.h>
+#include <stddef.h>
 
 ///< The class which defines how we will talk to this device over I2C
 class Adafruit_I2CDevice {
