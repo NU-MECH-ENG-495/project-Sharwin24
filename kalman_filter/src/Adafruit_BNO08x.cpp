@@ -33,8 +33,8 @@
  *     v1.0 - First release
  */
 
-#include "Arduino.h"
-#include <Wire.h>
+// #include "Arduino.h"
+// #include <Wire.h>
 
 #include "Adafruit_BNO08x.h"
 
