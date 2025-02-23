@@ -11,7 +11,7 @@
 #include <chrono>
 #include <thread>
 
-#include "VL53L1X_Registers.hpp"
+#include "vl53l1x_registers.hpp"
 
 class VL53L1X {
 public:

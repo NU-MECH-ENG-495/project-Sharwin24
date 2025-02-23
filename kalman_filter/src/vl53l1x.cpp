@@ -29,8 +29,8 @@
 #include <iostream>
 #include <string>
 
-#include "VL53L1X.hpp"
-#include "VL53L1X_Registers.hpp"
+#include "vl53l1x.hpp"
+#include "vl53l1x_registers.hpp"
 
 #define I2C_DEV "/dev/i2c-1"
 

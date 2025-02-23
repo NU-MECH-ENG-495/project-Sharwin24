@@ -15,6 +15,15 @@ include_directories(
   include/kalman_filter
 )
 
+# VL53L1X Node
+add_executable(vl53l1x src/vl53l1x_node.cpp)
+ament_target_dependencies(vl53l1x rclcpp sensor_msgs)
+
+install(TARGETS
+  vl53l1x
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
 
