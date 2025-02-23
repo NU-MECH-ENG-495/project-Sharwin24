@@ -6,9 +6,9 @@
 
 #include "BNO055.hpp"
 
-BNO055I2C::BNO055I2C(std::string device_, int address_) {
-  device = device_;
-  address = address_;
+BNO055I2C::BNO055I2C(std::string i2c_dev, uint8_t i2c_addr) {
+  device = i2c_dev;
+  address = i2c_addr;
 }
 
 bool BNO055I2C::reset() {

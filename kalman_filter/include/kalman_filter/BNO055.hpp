@@ -225,7 +225,7 @@ typedef struct {
 
 class BNO055I2C {
 public:
-  BNO055I2C(std::string dev, uint8_t i2c_addr);
+  BNO055I2C(std::string i2c_dev, uint8_t i2c_addr);
 
   void init();
   bool reset();
