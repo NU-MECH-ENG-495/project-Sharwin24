@@ -33,13 +33,13 @@ public:
     // the minimum timing budget is 20 ms for short distance mode and 33 ms for
     // medium and long distance modes. See the VL53L1X datasheet for more
     // information on range and timing limits.
-    sensor.setDistanceMode(VL53L1X::DistanceMode::Short);
-    sensor.setMeasurementTimingBudget(20000); // 20ms for Short distance mode
+    this->sensor.setDistanceMode(VL53L1X::DistanceMode::Short);
+    this->sensor.setMeasurementTimingBudget(20000); // 20ms for Short distance mode
 
     // Start continuous readings at a rate of one measurement every 100 ms (the
     // inter-measurement period). This period should be at least as long as the
     // timing budget.
-    sensor.startContinuous(static_cast<int>(1000.0 / this->sensor_freq));  // Hardcode testcase 100
+    this->sensor.startContinuous(static_cast<int>(1000.0 / this->sensor_freq));  // Hardcode testcase 100
 
     // Setup the publisher
     sensor_pub = this->create_publisher<sensor_msgs::msg::Range>("VL53L1X/range", 5);
@@ -48,8 +48,8 @@ public:
     rclcpp::TimerBase::SharedPtr timer = this->create_wall_timer(
       std::chrono::milliseconds(static_cast<int>(1000.0 / this->sensor_freq)),
       [this]() {
-        int distance = sensor.read_range();
-        if (sensor.timeoutOccurred()) {
+        uint16_t distance = this->sensor.read_range();
+        if (this->sensor.timeoutOccurred()) {
           RCLCPP_ERROR(this->get_logger(), "Timeout Occured!");
           distance = 0;
         }
@@ -68,7 +68,7 @@ public:
         // from https://github.com/ros2/common_interfaces/blob/master/sensor_msgs/msg/Range.msg
         // # (Note: values < range_min or > range_max should be discarded)
         if ((msg.range >= msg.min_range) && (msg.range <= msg.max_range)) {
-          sensor_pub->publish(msg);
+          this->sensor_pub->publish(msg);
         }
       }
     );
