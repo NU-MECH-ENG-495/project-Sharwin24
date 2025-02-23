@@ -11,7 +11,9 @@
 // I2C Bus on Raspberry Pi 5
 #define I2C_DEVICE "/dev/i2c-1"
 // I2C address of the BN0O85 IMU
-#define IMU_ADDR 0x4A 
+#define IMU_ADDR 0x4A
+
+#define FIFTY_HZ 20000
 
 uint8_t CARGO_NO = 0x00; // SHTP Sequence Number
 uint8_t START_BNO_ALGO[21] = {
@@ -36,15 +38,13 @@ int openI2CBus() {
   if (file < 0) {
     std::cerr << "Failed to open I2C bus\n";
     return -1;
-  }
-  else {
+  } else {
     std::cout << "Succesfully opened I2C bus (" << I2C_DEVICE << ")" << std::endl;
   }
   if (ioctl(file, I2C_SLAVE, IMU_ADDR) < 0) {
     std::cerr << "Failed to connect to I2C device\n";
     return -1;
-  }
-  else {
+  } else {
     std::cout << "Succesfully connected to I2C device (ADDR=" << IMU_ADDR << ")" << std::endl;
   }
   return file;
@@ -65,6 +65,8 @@ bool i2cRead(int file, uint8_t reg, uint8_t* data, size_t len) {
   if (write(file, &reg, 1) != 1) {
     std::cerr << "Error setting register address\n";
     return false;
+  } else {
+    std::cout << "Succesfully set register address\n";
   }
   return read(file, data, len) == len;
 }
@@ -74,9 +76,30 @@ int main() {
   if (file < 0) return 1;
 
   // Configure IMU to stream data
-  i2cWrite(file, 0x00, START_BNO_ALGO, 21);
-  // Read data and print stream
+  if (!i2cWrite(file, 0x00, START_BNO_ALGO, 21)) {
+    std::cerr << "Failed to write to IMU\n";
+    close(file);
+    return 1;
+  } else {
+    std::cout << "Succesfully wrote to IMU\n";
+  }
+  sleep(1); // Give the sensor time to start streaming
 
+  const size_t packetLen = 32; // Adjust based on your protocol details
+  uint8_t packet[packetLen];
+  while (true) {
+    if (i2cRead(file, 0x00, packet, packetLen)) {
+      std::cout << "Received packet: ";
+      for (size_t i = 0; i < packetLen; i++) {
+        // std::cout << std::hex << (int)packet[i] << " ";
+        std::printf("%02x ", packet[i]);
+      }
+      std::cout << std::endl;
+    } else {
+      std::cerr << "Failed to read from IMU\n";
+    }
+    usleep(FIFTY_HZ); // 50 Hz is 20ms
+  }
 
   close(file);
   return 0;
