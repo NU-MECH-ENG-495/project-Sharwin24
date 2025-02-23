@@ -85,7 +85,7 @@ int main() {
   }
   sleep(1); // Give the sensor time to start streaming
 
-  const size_t packetLen = 32; // Adjust based on your protocol details
+  const size_t packetLen = 16; // Adjust based on your protocol details
   uint8_t packet[packetLen];
   while (true) {
     if (i2cRead(file, 0x00, packet, packetLen)) {
