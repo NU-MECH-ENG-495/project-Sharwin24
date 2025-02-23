@@ -32,6 +32,8 @@
 #include "VL53L1X.hpp"
 #include "VL53L1X_Registers.hpp"
 
+#define I2C_DEV "/dev/i2c-1"
+
 // Constructor /////////////////////////////////////////////////////
 VL53L1X::VL53L1X()
   : address(AddressDefault)
@@ -50,7 +52,7 @@ VL53L1X::VL53L1X()
 //and initialise the sensor
 bool VL53L1X::init() {
   // Open it i2c port
-  if ((fd = open("/dev/i2c-1", O_RDWR)) < 0) {
+  if ((fd = open(I2C_DEV, O_RDWR)) < 0) {
     return false;
   }
 
