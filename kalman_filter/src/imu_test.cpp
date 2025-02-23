@@ -8,11 +8,13 @@
 // Sensor Hub Transport Protocol
 // #include "sh2.h"
 
-#define I2C_DEVICE "/dev/i2c-1" // I2C Bus on Raspberry Pi 5
-#define IMU_ADDR 0x4A // I2C address of the BN0O85 IMU
+// I2C Bus on Raspberry Pi 5
+#define I2C_DEVICE "/dev/i2c-1"
+// I2C address of the BN0O85 IMU
+#define IMU_ADDR 0x4A 
 
 uint8_t CARGO_NO = 0x00; // SHTP Sequence Number
-uint8_t START_BNO_ALGO[21] = { 
+uint8_t START_BNO_ALGO[21] = {
   0x15, 0x00, 0x02, CARGO_NO, 0xFD, 0x28, 0x00,
   0x00, 0x00, 0x20, 0x4e, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
@@ -35,9 +37,15 @@ int openI2CBus() {
     std::cerr << "Failed to open I2C bus\n";
     return -1;
   }
+  else {
+    std::cout << "Succesfully opened I2C bus (" << I2C_DEVICE << ")" << std::endl;
+  }
   if (ioctl(file, I2C_SLAVE, IMU_ADDR) < 0) {
     std::cerr << "Failed to connect to I2C device\n";
     return -1;
+  }
+  else {
+    std::cout << "Succesfully connected to I2C device (ADDR=" << IMU_ADDR << ")" << std::endl;
   }
   return file;
 }
@@ -68,6 +76,7 @@ int main() {
   // Configure IMU to stream data
   i2cWrite(file, 0x00, START_BNO_ALGO, 21);
   // Read data and print stream
+
 
   close(file);
   return 0;
