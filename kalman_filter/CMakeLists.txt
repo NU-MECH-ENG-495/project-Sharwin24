@@ -26,6 +26,10 @@ ament_target_dependencies(VL53L1X_Sensor rclcpp sensor_msgs)
 
 install(TARGETS
   VL53L1X_Sensor
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(TARGETS
   BNO055_Sensor
   DESTINATION lib/${PROJECT_NAME}
 )
