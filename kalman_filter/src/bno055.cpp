@@ -68,8 +68,6 @@ void BNO055::init(std::string i2c_device, uint8_t i2c_address) {
 
 IMURecord BNO055::read() {
   IMURecord record;
-  unsigned char c = 0;
-
   // can only read a length of 0x20 at a time, so do it in 2 reads
   // BNO055_LINEAR_ACCEL_DATA_X_LSB_ADDR is the start of the data block that aligns with the IMURecord struct
   if (_i2c_smbus_read_i2c_block_data(this->file, BNO055_ACCEL_DATA_X_LSB_ADDR, 0x20, (uint8_t*)&record) != 0x20) {
