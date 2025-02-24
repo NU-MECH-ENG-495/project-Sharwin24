@@ -16,8 +16,31 @@ include_directories(
   include/kalman_filter
 )
 
+# BN0055 Node
 add_executable(BNO055_Sensor src/bno055_node.cpp src/bno055.cpp)
 ament_target_dependencies(BNO055_Sensor rclcpp sensor_msgs)
+
+# VL53L1X Node
+add_executable(VL53L1X_Sensor src/vl53l1x_node.cpp src/vl53l1x.cpp)
+ament_target_dependencies(VL53L1X_Sensor rclcpp sensor_msgs)
+
+install(TARGETS
+  VL53L1X_Sensor
+  BNO055_Sensor
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+# Install launch files
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
+# Install config files
+install(DIRECTORY
+  config
+  DESTINATION share/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
