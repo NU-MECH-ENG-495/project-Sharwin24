@@ -39,7 +39,7 @@ VL53L1XNode::VL53L1XNode() : Node("VL53L1X_Sensor") {
   sensor_pub = this->create_publisher<sensor_msgs::msg::Range>("VL53L1X/range", 5);
 
   // Create a timer to publish the sensor data
-  rclcpp::TimerBase::SharedPtr timer = this->create_wall_timer(
+  this->timer = this->create_wall_timer(
     std::chrono::milliseconds(static_cast<int>(1000.0 / this->sensor_freq)),
     [this]() {
       uint16_t distance = this->sensor.read_range();

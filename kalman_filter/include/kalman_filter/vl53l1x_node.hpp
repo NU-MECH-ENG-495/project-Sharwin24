@@ -16,6 +16,7 @@ public:
   ~VL53L1XNode();
 
 private:
+  rclpp::TimerBase::SharedPtr timer;
   rclcpp::Publisher<sensor_msgs::msg::Range>::SharedPtr sensor_pub;
   VL53L1X sensor;
   unsigned int sensor_timeout_ms;
