@@ -4,7 +4,6 @@
 #include "sensor_msgs/msg/temperature.hpp"
 #include "bno055_node.hpp"
 #include "bno055.hpp"
-#include "bno055_registers.hpp"
 
 #define I2C_DEVICE "/dev/i2c-1"
 
@@ -15,7 +14,7 @@ BNO055Node::BNO055Node() : Node("bno055") {
   this->sensor_freq = this->get_parameter("sensor_freq").as_double();
 
   // Initialize the BNO055 sensor
-  this->sensor = BNO055(I2C_DEVICE, BNO055_ADDRESS_A);
+  this->sensor.init(I2C_DEVICE, BNO055_ADDRESS_A); //= BNO055(I2C_DEVICE, BNO055_ADDRESS_A);
 
   // Initialize the publishers
   this->imu_pub = this->create_publisher<sensor_msgs::msg::Imu>("bno055_data/imu", 10);

@@ -51,18 +51,15 @@ typedef struct {
 
 class BNO055{
 public:
-  BNO055(std::string i2c_dev, uint8_t i2c_addr);
-  ~BNO055();
+  BNO055() = default;
+  ~BNO055() = default;
 
-  void init();
+  void init(std::string i2c_dev, uint8_t i2c_addr);
   bool reset();
 
   IMURecord read();
-
 private:
-  int file;
-  std::string i2c_device;
-  uint8_t i2c_addr;
+  int file; // file descriptor for I2C device
 };
 
 #endif // _BNO055_HPP_
