@@ -18,6 +18,11 @@ VL53L1XNode::VL53L1XNode() : Node("VL53L1X_Sensor") {
   this->sensor_timeout_ms = this->get_parameter("sensor_timeout_ms").as_int();
   this->sensor_freq = this->get_parameter("sensor_frequency").as_double();
 
+  // Ensure the sensor frequency does not exceed 50Hz
+  if (this->sensor_freq > 50.0) {
+    this->sensor_freq = 50.0;
+  }
+
   // Set a 500ms timeout on the sensor. (Stop waiting and respond with an error)
   this->sensor.setTimeout(sensor_timeout_ms);
 
