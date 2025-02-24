@@ -1,0 +1,4 @@
+time_of_flight_sensor:
+  ros__parameters:
+    sensor_timeout_ms: 500
+    sensor_frequency: 25

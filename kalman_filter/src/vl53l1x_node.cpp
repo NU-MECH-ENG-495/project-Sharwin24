@@ -11,9 +11,12 @@
 #include "vl53l1x.hpp"  // Library for the range sensor
 
 VL53L1XNode::VL53L1XNode() : Node("VL53L1X_Sensor") {
-  // Declare and get Parameters
+  // Declare Parameters
   this->sensor_timeout_ms = this->declare_parameter("sensor_timeout_ms", 500);
   this->sensor_freq = this->declare_parameter("sensor_frequency", 25.0);
+  // Get parameters from config file
+  this->sensor_timeout_ms = this->get_parameter("sensor_timeout_ms").as_int();
+  this->sensor_freq = this->get_parameter("sensor_frequency").as_double();
 
   // Set a 500ms timeout on the sensor. (Stop waiting and respond with an error)
   this->sensor.setTimeout(sensor_timeout_ms);
