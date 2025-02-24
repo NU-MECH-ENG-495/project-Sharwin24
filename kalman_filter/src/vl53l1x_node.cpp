@@ -10,12 +10,7 @@
 #include "vl53l1x_node.hpp"
 #include "vl53l1x.hpp"  // Library for the range sensor
 
-using namespace std::chrono_literals;
-
-/* This example creates a subclass of Node and uses std::bind() to register a
-* member function as a callback from the timer. */
-
-VL53L1XNode::VL53L1XNode() : Node("VL53L1XNode") {
+VL53L1XNode::VL53L1XNode() : Node("VL53L1X_Sensor") {
   // Declare and get Parameters
   this->sensor_timeout_ms = this->declare_parameter("sensor_timeout_ms", 500);
   this->sensor_freq = this->declare_parameter("sensor_frequency", 25.0);
@@ -54,7 +49,7 @@ VL53L1XNode::VL53L1XNode() : Node("VL53L1XNode") {
       }
       rclcpp::Time now = this->get_clock()->now();
       sensor_msgs::msg::Range msg;
-      msg.header.frame_id = "VL53L1X";
+      msg.header.frame_id = "VL53L1X_frame";
       msg.header.stamp = now;
       msg.radiation_type = sensor_msgs::msg::Range::INFRARED;
       msg.field_of_view = 0.471239;  // 27 degrees in radians
