@@ -1,5 +1,4 @@
 #include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/header.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/magnetic_field.hpp"
 #include "sensor_msgs/msg/temperature.hpp"
@@ -28,15 +27,12 @@ BNO055Node::BNO055Node() : Node("bno055") {
     std::chrono::duration<double>(1.0 / this->sensor_freq), // [s]
     [this]() -> void {
       IMURecord record = this->sensor.read();
-
-      // Create a header for the IMU data
-      std_msgs::msg::Header header;
-      header.stamp = this->now();
-      header.frame_id = "imu_frame";
+      const std::string sensor_frame_id = "imu_frame";
 
       // IMU data
       sensor_msgs::msg::Imu imu_msg;
-      imu_msg.header = header;
+      imu_msg.header.stamp = this->now();
+      imu_msg.header.frame_id = sensor_frame_id;
       imu_msg.linear_acceleration.x = record.raw_linear_acceleration_x;
       imu_msg.linear_acceleration.y = record.raw_linear_acceleration_y;
       imu_msg.linear_acceleration.z = record.raw_linear_acceleration_z;
@@ -50,14 +46,16 @@ BNO055Node::BNO055Node() : Node("bno055") {
 
       // Magnetic field data
       sensor_msgs::msg::MagneticField mag_msg;
-      mag_msg.header = header;
+      mag_msg.header.stamp = this->now();
+      mag_msg.header.frame_id = sensor_frame_id;
       mag_msg.magnetic_field.x = record.raw_magnetic_field_x;
       mag_msg.magnetic_field.y = record.raw_magnetic_field_y;
       mag_msg.magnetic_field.z = record.raw_magnetic_field_z;
 
       // Temperature data
       sensor_msgs::msg::Temperature temp_msg;
-      temp_msg.header = header;
+      temp_msg.header.stamp = this->now();
+      temp_msg.header.frame_id = sensor_frame_id;
       temp_msg.temperature = record.temperature;
 
       // Publish the data

@@ -16,6 +16,9 @@ include_directories(
   include/kalman_filter
 )
 
+add_executable(BNO055_Sensor src/bno055_node.cpp src/bno055.cpp)
+ament_target_dependencies(BNO055_Sensor rclcpp sensor_msgs)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
 
