@@ -37,12 +37,12 @@
 // Constructor /////////////////////////////////////////////////////
 VL53L1X::VL53L1X()
   : address(AddressDefault)
-  , io_timeout(0) // no timeout
+  , last_status(0)
   , did_timeout(false)
+  , io_timeout(0) // no timeout
   , calibrated(false)
   , saved_vhv_init(0)
   , saved_vhv_timeout(0)
-  , last_status(0)
   , distance_mode(Unknown) {
 }
 
@@ -487,7 +487,7 @@ uint8_t VL53L1X::readReg(uint16_t reg) {
   writeBuffer[1] = (reg & 0xFF);  // reg low byte
 
 
-  if (write(fd, writeBuffer, sizeof(writeBuffer)) < sizeof(writeBuffer)) {
+  if (write(fd, writeBuffer, sizeof(writeBuffer)) < static_cast<ssize_t>(sizeof(writeBuffer))) {
     //something went wrong
     std::cout << "DEBUG: ERROR on write to i2c" << std::endl;
     return 0x00;
@@ -506,14 +506,14 @@ uint16_t VL53L1X::readReg16Bit(uint16_t reg) {
   writeBuffer[0] = ((reg >> 8) & 0xFF);  // reg high byte
   writeBuffer[1] = (reg & 0xFF);  // reg low byte
 
-  if (write(fd, writeBuffer, sizeof(writeBuffer)) < sizeof(writeBuffer)) {
+  if (write(fd, writeBuffer, sizeof(writeBuffer)) < static_cast<ssize_t>(sizeof(writeBuffer))) {
     //something went wrong
     std::cout << "ERROR on write to i2c" << std::endl;
     return 0x0000;
   }
 
   uint8_t readBuffer[2];
-  if (read(fd, readBuffer, sizeof(readBuffer)) < sizeof(readBuffer)) {
+  if (read(fd, readBuffer, sizeof(readBuffer)) < static_cast<ssize_t>(sizeof(writeBuffer))) {
     std::cout << "Error on read from i2c" << std::endl;
     return 0x0000;
   }
@@ -602,14 +602,14 @@ void VL53L1X::readResults() {
   writeBuffer[0] = ((RESULT__RANGE_STATUS >> 8) & 0xFF);  // reg high byte
   writeBuffer[1] = (RESULT__RANGE_STATUS & 0xFF);  // reg low byte
 
-  if (write(fd, writeBuffer, sizeof(writeBuffer)) < sizeof(writeBuffer)) {
+  if (write(fd, writeBuffer, sizeof(writeBuffer)) < static_cast<ssize_t>(sizeof(writeBuffer))) {
     //something went wrong
     std::cout << "ERROR on write to i2c" << std::endl;
     return;
   }
 
   uint8_t readBuffer[17];
-  if (read(fd, readBuffer, sizeof(readBuffer)) < sizeof(readBuffer)) {
+  if (read(fd, readBuffer, sizeof(readBuffer)) < static_cast<ssize_t>(sizeof(writeBuffer))) {
     std::cout << "Error on read from i2c" << std::endl;
     return;
   }
