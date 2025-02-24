@@ -10,16 +10,10 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
-
 #include <linux/i2c-dev.h>
 #include <smbus_functions.h>
 
-#include "rclcpp/rclcpp.hpp"
-#include "sensor_msgs/msg/imu.hpp"
-#include "sensor_msgs/msg/magnetic_field.hpp"
-#include "sensor_msgs/msg/temperature.hpp"
-
-#include "BNO055_Registers.hpp"
+#include "bno055_registers.hpp"
 
 // order of this struct is designed to match the I2C registers
 // so all data can be read in one fell swoop
@@ -55,10 +49,10 @@ typedef struct {
   uint8_t system_error_code;
 } IMURecord;
 
-class BNO055I2C : public rclcpp::Node{
+class BNO055{
 public:
-  BNO055I2C(std::string i2c_dev, uint8_t i2c_addr);
-  ~BNO055I2C();
+  BNO055(std::string i2c_dev, uint8_t i2c_addr);
+  ~BNO055();
 
   void init();
   bool reset();
@@ -67,13 +61,8 @@ public:
 
 private:
   int file;
-  std::string device;
-  uint8_t address;
-  float timer_freq;
-  
-  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_pub;
-  rclcpp::Publisher<sensor_msgs::msg::MagneticField>::SharedPtr mag_pub;
-  rclcpp::Publisher<sensor_msgs::msg::Temperature>::SharedPtr temp_pub;
+  std::string i2c_device;
+  uint8_t i2c_addr;
 };
 
 #endif // _BNO055_HPP_
