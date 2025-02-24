@@ -39,8 +39,9 @@ VL53L1XNode::VL53L1XNode() : Node("VL53L1X_Sensor") {
   this->sensor.startContinuous(static_cast<int>(1000.0 / this->sensor_freq));  // Hardcode testcase 100
 
   // Setup the publisher
-  sensor_pub = this->create_publisher<sensor_msgs::msg::Range>("VL53L1X/range", 5);
-
+  const std::string topic = "VL53L1X/range";
+  sensor_pub = this->create_publisher<sensor_msgs::msg::Range>(topic, 5);
+  RCLCPP_INFO(this->get_logger(), "VL53L1X Sensor publishing on topic %s at %f Hz", topic, this->sensor_freq);
   // Create a timer to publish the sensor data
   this->timer = this->create_wall_timer(
     std::chrono::milliseconds(static_cast<int>(1000.0 / this->sensor_freq)),
