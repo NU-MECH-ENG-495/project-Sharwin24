@@ -8,10 +8,32 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(Doxygen)
 
 include_directories(
   include/kalman_filter
+)
+
+# VL53L1X Node
+add_executable(VL53L1X_Sensor src/vl53l1x_node.cpp src/vl53l1x.cpp)
+ament_target_dependencies(VL53L1X_Sensor rclcpp sensor_msgs)
+
+install(TARGETS
+  VL53L1X_Sensor
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+# Install launch files
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
+# Install config files
+install(DIRECTORY
+  config
+  DESTINATION share/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)

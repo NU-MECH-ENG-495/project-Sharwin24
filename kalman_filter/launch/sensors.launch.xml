@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="kalman_filter" exec="VL53L1X_Sensor" name="time_of_flight_sensor" output="screen">
+    <param from="$(find-pkg-share kalman_filter)/config/sensors_config.yaml"/>
+  </node>
+</launch>
