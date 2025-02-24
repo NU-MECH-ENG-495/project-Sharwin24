@@ -16,8 +16,6 @@ public:
   ~VL53L1XNode();
 
 private:
-  void timer_callback();
-
   rclcpp::TimerBase::SharedPtr timer;
   rclcpp::Publisher<sensor_msgs::msg::Range>::SharedPtr sensor_pub;
   VL53L1X sensor;

@@ -16,7 +16,7 @@ include_directories(
 )
 
 # VL53L1X Node
-add_executable(VL53L1X_Sensor src/vl53l1x_node.cpp)
+add_executable(VL53L1X_Sensor src/vl53l1x_node.cpp src/vl53l1x.cpp)
 ament_target_dependencies(VL53L1X_Sensor rclcpp sensor_msgs)
 
 install(TARGETS

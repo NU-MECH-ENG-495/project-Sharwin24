@@ -1,4 +1,5 @@
-#pragma once
+#ifndef VL53L1X_HPP
+#define VL53L1X_HPP
 
 #include <stdio.h>
 #include <linux/i2c-dev.h> // for the ioctl() function
@@ -16,7 +17,7 @@
 class VL53L1X {
 public:
   VL53L1X();
-  ~VL53L1X();
+  ~VL53L1X() = default;
 
   enum DistanceMode { Short, Medium, Long, Unknown };
   enum RangeStatus : uint8_t {
@@ -189,3 +190,5 @@ private:
   // Convert count rate from fixed point 9.7 format to float
   float countRateFixedToFloat(uint16_t count_rate_fixed) { return (float)count_rate_fixed / (1 << 7); }
 };
+
+#endif
