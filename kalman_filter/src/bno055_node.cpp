@@ -65,7 +65,7 @@ BNO055Node::BNO055Node() : Node("BNO055_Sensor") {
   );
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<BNO055Node>());
   rclcpp::shutdown();
