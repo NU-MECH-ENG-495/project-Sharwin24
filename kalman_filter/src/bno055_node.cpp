@@ -7,7 +7,7 @@
 
 #define I2C_DEVICE "/dev/i2c-1"
 
-BNO055Node::BNO055Node() : Node("bno055") {
+BNO055Node::BNO055Node() : Node("BNO055_Sensor") {
   // Declare parameters
   this->sensor_freq = this->declare_parameter("sensor_freq", 100.0); // [Hz]
   // Get parameter from yaml file
