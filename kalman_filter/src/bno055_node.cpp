@@ -16,10 +16,18 @@ BNO055Node::BNO055Node() : Node("BNO055_Sensor") {
   // Initialize the BNO055 sensor
   this->sensor.init(I2C_DEVICE, BNO055_ADDRESS_A); //= BNO055(I2C_DEVICE, BNO055_ADDRESS_A);
 
+  // Topics
+  const std::string imu_topic = "bno055_data/imu";
+  const std::string mag_topic = "bno055_data/mag";
+  const std::string temp_topic = "bno055_data/temp";
+
   // Initialize the publishers
-  this->imu_pub = this->create_publisher<sensor_msgs::msg::Imu>("bno055_data/imu", 10);
-  this->mag_pub = this->create_publisher<sensor_msgs::msg::MagneticField>("bno055_data/mag", 10);
-  this->temp_pub = this->create_publisher<sensor_msgs::msg::Temperature>("bno055_data/temp", 10);
+  this->imu_pub = this->create_publisher<sensor_msgs::msg::Imu>(imu_topic, 10);
+  this->mag_pub = this->create_publisher<sensor_msgs::msg::MagneticField>(mag_topic, 10);
+  this->temp_pub = this->create_publisher<sensor_msgs::msg::Temperature>(temp_topic, 10);
+
+  RCLCPP_INFO(this->get_logger(), "BNO055 Sensor publishing on topics: (%s), (%s), (%s) at %.1f Hz",
+    imu_topic.c_str(), mag_topic.c_str(), temp_topic.c_str(), this->sensor_freq);
 
   // Create a timer with a 100ms period to read and publish
   this->timer = this->create_wall_timer(
