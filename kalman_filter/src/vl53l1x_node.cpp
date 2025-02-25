@@ -28,53 +28,46 @@ VL53L1XNode::VL53L1XNode() : Node("VL53L1X_Sensor") {
 
   if (!this->sensor.init()) {
     RCLCPP_ERROR(this->get_logger(), "Sensor offline!");
+  } else {
+    RCLCPP_INFO(this->get_logger(), "Sensor online!");
+
+    this->sensor.setDistanceMode(VL53L1X::DistanceMode::Short);
+    this->sensor.setMeasurementTimingBudget(20000); // 20ms for Short distance mode
+    this->sensor.startContinuous(static_cast<int>(1000.0 / this->sensor_freq));  // Hardcode testcase 100
+
+    // Setup the publisher
+    const std::string topic = "VL53L1X/range";
+    sensor_pub = this->create_publisher<sensor_msgs::msg::Range>(topic, 5);
+    RCLCPP_INFO(this->get_logger(), "VL53L1X Sensor publishing on topic (%s) at %.1f Hz", topic.c_str(), this->sensor_freq);
+    // Create a timer to publish the sensor data
+    this->timer = this->create_wall_timer(
+      std::chrono::milliseconds(static_cast<int>(1000.0 / this->sensor_freq)),
+      [this]() -> void {
+        uint16_t distance = this->sensor.read_range();
+        if (this->sensor.timeoutOccurred()) {
+          RCLCPP_ERROR(this->get_logger(), "Timeout Occured!");
+          distance = 0;
+        }
+        rclcpp::Time now = this->get_clock()->now();
+        sensor_msgs::msg::Range msg;
+        msg.header.frame_id = "VL53L1X_frame";
+        msg.header.stamp = now;
+        msg.radiation_type = sensor_msgs::msg::Range::INFRARED;
+        msg.field_of_view = 0.471239;  // 27 degrees in radians
+        // msg.min_range = 0.14;                  // 140 mm.  (It is actully much less, but this makes sense in the context
+        // msg.max_range = 3.00;                  // 3.6 m. in the dark, down to 73cm in bright light
+        msg.min_range = 0.04;          // 4 cm for short distance mode
+        msg.max_range = 1.35;          // 135 cm for short distance mode
+        msg.range = static_cast<float>(distance) / 1000.0;  // Convert mm to meters
+
+        // from https://github.com/ros2/common_interfaces/blob/master/sensor_msgs/msg/Range.msg
+        // # (Note: values < range_min or > range_max should be discarded)
+        if ((msg.range >= msg.min_range) && (msg.range <= msg.max_range)) {
+          this->sensor_pub->publish(msg);
+        }
+      }
+    );
   }
-
-  // Use long distance mode and allow up to 50000 us (50 ms) for a measurement.
-  // You can change these settings to adjust the performance of the sensor, but
-  // the minimum timing budget is 20 ms for short distance mode and 33 ms for
-  // medium and long distance modes. See the VL53L1X datasheet for more
-  // information on range and timing limits.
-  this->sensor.setDistanceMode(VL53L1X::DistanceMode::Short);
-  this->sensor.setMeasurementTimingBudget(20000); // 20ms for Short distance mode
-
-  // Start continuous readings at a rate of one measurement every 100 ms (the
-  // inter-measurement period). This period should be at least as long as the
-  // timing budget.
-  this->sensor.startContinuous(static_cast<int>(1000.0 / this->sensor_freq));  // Hardcode testcase 100
-
-  // Setup the publisher
-  const std::string topic = "VL53L1X/range";
-  sensor_pub = this->create_publisher<sensor_msgs::msg::Range>(topic, 5);
-  RCLCPP_INFO(this->get_logger(), "VL53L1X Sensor publishing on topic (%s) at %.1f Hz", topic.c_str(), this->sensor_freq);
-  // Create a timer to publish the sensor data
-  this->timer = this->create_wall_timer(
-    std::chrono::milliseconds(static_cast<int>(1000.0 / this->sensor_freq)),
-    [this]() -> void {
-      uint16_t distance = this->sensor.read_range();
-      if (this->sensor.timeoutOccurred()) {
-        RCLCPP_ERROR(this->get_logger(), "Timeout Occured!");
-        distance = 0;
-      }
-      rclcpp::Time now = this->get_clock()->now();
-      sensor_msgs::msg::Range msg;
-      msg.header.frame_id = "VL53L1X_frame";
-      msg.header.stamp = now;
-      msg.radiation_type = sensor_msgs::msg::Range::INFRARED;
-      msg.field_of_view = 0.471239;  // 27 degrees in radians
-      // msg.min_range = 0.14;                  // 140 mm.  (It is actully much less, but this makes sense in the context
-      // msg.max_range = 3.00;                  // 3.6 m. in the dark, down to 73cm in bright light
-      msg.min_range = 0.04;          // 4 cm for short distance mode
-      msg.max_range = 1.35;          // 135 cm for short distance mode
-      msg.range = static_cast<float>(distance) / 1000.0;  // Convert mm to meters
-
-      // from https://github.com/ros2/common_interfaces/blob/master/sensor_msgs/msg/Range.msg
-      // # (Note: values < range_min or > range_max should be discarded)
-      if ((msg.range >= msg.min_range) && (msg.range <= msg.max_range)) {
-        this->sensor_pub->publish(msg);
-      }
-    }
-  );
 }
 
 VL53L1XNode::~VL53L1XNode() {
