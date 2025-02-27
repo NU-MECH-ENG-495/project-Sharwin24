@@ -49,7 +49,7 @@ typedef struct {
   uint8_t system_error_code;
 } IMURecord;
 
-class BNO055{
+class BNO055 {
 public:
   BNO055() = default;
   ~BNO055() = default;

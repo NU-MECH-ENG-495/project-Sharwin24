@@ -1,6 +1,6 @@
 /* BNO055.cpp
  * Author: Dheera Venkatraman <dheera@dheera.net>
- * 
+ *
  * Modified by Sharwin Patil
  */
 
@@ -13,11 +13,11 @@
 bool BNO055::reset() {
   _i2c_smbus_write_byte_data(this->file, BNO055_OPR_MODE_ADDR, BNO055_OPERATION_MODE_CONFIG);
   std::this_thread::sleep_for(std::chrono::milliseconds(25));
-  
+
   // reset
   _i2c_smbus_write_byte_data(this->file, BNO055_SYS_TRIGGER_ADDR, 0x20);
   std::this_thread::sleep_for(std::chrono::milliseconds(25));
-  
+
   int i = 0;
   // wait for chip to come back online
   while (_i2c_smbus_read_byte_data(this->file, BNO055_CHIP_ID_ADDR) != BNO055_ID) {

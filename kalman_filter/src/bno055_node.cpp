@@ -14,7 +14,15 @@ BNO055Node::BNO055Node() : Node("BNO055_Sensor") {
   this->sensor_freq = this->get_parameter("sensor_freq").as_double();
 
   // Initialize the BNO055 sensor
-  this->sensor.init(I2C_DEVICE, BNO055_ADDRESS_A); //= BNO055(I2C_DEVICE, BNO055_ADDRESS_A);
+  try {
+    this->sensor.init(I2C_DEVICE, BNO055_ADDRESS_A);
+  }
+  catch (const std::exception& e) {
+    rclcpp::shutdown();
+    throw std::runtime_error("BNO055 Sensor offline, shutting down node: " + std::string(e.what()));
+  }
+
+  RCLCPP_INFO(this->get_logger(), "BNO055 Sensor online!");
 
   // Topics
   const std::string imu_topic = "bno055_data/imu";
@@ -73,9 +81,15 @@ BNO055Node::BNO055Node() : Node("BNO055_Sensor") {
   );
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char* argv[]) {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<BNO055Node>());
+  try {
+    auto node = std::make_shared<BNO055Node>();
+    rclcpp::spin(node);
+  }
+  catch (const std::exception& e) {
+    RCLCPP_FATAL(rclcpp::get_logger("rclcpp"), e.what());
+  }
   rclcpp::shutdown();
   return 0;
 }
