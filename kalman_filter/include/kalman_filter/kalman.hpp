@@ -6,7 +6,6 @@
 #include "sensor_msgs/msg/magnetic_field.hpp"
 #include "sensor_msgs/msg/temperature.hpp"
 #include "sensor_msgs/msg/range.hpp"
-#include <eigen3/Eigen/Dense>
 
 using IMU = sensor_msgs::msg::Imu;
 using MagField = sensor_msgs::msg::MagneticField;
@@ -23,6 +22,7 @@ void imu_callback(const sensor_msgs::msg::Imu::SharedPtr msg);
 void mag_callback(const sensor_msgs::msg::MagneticField::SharedPtr msg);
 void temp_callback(const sensor_msgs::msg::Temperature::SharedPtr msg);
 void range_callback(const sensor_msgs::msg::Range::SharedPtr msg);
+void timer_callback();
 
 rclcpp::Subscription<IMU>::SharedPtr imu_subscription_;
 rclcpp::Subscription<MagField>::SharedPtr mag_subscription_;
