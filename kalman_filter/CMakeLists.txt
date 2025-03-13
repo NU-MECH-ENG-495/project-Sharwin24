@@ -24,7 +24,7 @@ add_executable(VL53L1X_Sensor src/vl53l1x_node.cpp src/vl53l1x.cpp)
 ament_target_dependencies(VL53L1X_Sensor rclcpp sensor_msgs)
 
 # Kalman Filter Node
-add_executable(Kalman_Filter src/kalman_filter_node.cpp)
+add_executable(Kalman_Filter src/kalman.cpp)
 ament_target_dependencies(Kalman_Filter rclcpp sensor_msgs)
 
 install(TARGETS

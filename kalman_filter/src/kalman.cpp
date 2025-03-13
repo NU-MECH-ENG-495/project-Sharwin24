@@ -55,23 +55,23 @@ KalmanFilter::KalmanFilter() : Node("Kalman_Filter") {
 }
 
 void KalmanFilter::timer_callback() {
-  RCLCPP_INFO(this->get_logger(), "Timer callback");
+
 }
 
 void KalmanFilter::imu_callback(const sensor_msgs::msg::Imu::SharedPtr msg) {
-  RCLCPP_INFO(this->get_logger(), "IMU callback");
+  (void)msg;
 }
 
 void KalmanFilter::mag_callback(const sensor_msgs::msg::MagneticField::SharedPtr msg) {
-  RCLCPP_INFO(this->get_logger(), "Magnetic Field callback");
+  (void)msg;
 }
 
 void KalmanFilter::temp_callback(const sensor_msgs::msg::Temperature::SharedPtr msg) {
-  RCLCPP_INFO(this->get_logger(), "Temperature callback");
+  (void)msg;
 }
 
 void KalmanFilter::range_callback(const sensor_msgs::msg::Range::SharedPtr msg) {
-  RCLCPP_INFO(this->get_logger(), "Range callback");
+  (void)msg;
 }
 
 int main(int argc, char *argv[]) {
