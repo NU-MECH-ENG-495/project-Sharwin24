@@ -19,11 +19,11 @@ typedef struct {
   float z_ddot; // z acceleration of the end effector [mm/s^2]
 } StateVector;
 
-KalmanFilter::KalmanFilter() : Node("KalmanFilter") {
+KalmanFilter::KalmanFilter() : Node("Kalman_Filter") {
   // Declare parameters
-  this->timer_freq = this->declare_parameter("timer_freq", 100.0); // [Hz]
+  this->timer_freq = this->declare_parameter("timer_frequency", 100.0); // [Hz]
   // Get parameter from yaml file
-  this->timer_freq = this->get_parameter("timer_freq").as_double();
+  this->timer_freq = this->get_parameter("timer_frequency").as_double();
 
   // Topics
   const std::string imu_topic = "bno055/imu";
