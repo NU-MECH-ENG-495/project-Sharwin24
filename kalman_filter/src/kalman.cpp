@@ -86,16 +86,15 @@ void KalmanFilter::applyAlphaBetaFilter(float z, AlphaBetaFilter& filter) {
   filter.prevMeasureTime = this->now();
 
   // Prediction Step
-  float dx = filter.previousRateEstimate;
-  filter.estimate = filter.previousEstimate + (dx * dt);
+  filter.estimate = filter.previousEstimate + (filter.rateEstimate * dt);
   
   // Update Step
   float residual = z - filter.estimate;
   filter.estimate += filter.alpha * residual;
-  dx += filter.beta * (residual / dt);
+  filter.rateEstimate += filter.beta * (residual / dt);
 
   // Update the filter state
-  filter.previousRateEstimate = dx;
+  filter.previousRateEstimate = filter.rateEstimate;
   filter.previousEstimate = filter.estimate;
 }
 

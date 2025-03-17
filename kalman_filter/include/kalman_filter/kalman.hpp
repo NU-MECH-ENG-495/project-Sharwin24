@@ -16,6 +16,7 @@ typedef struct {
   float alpha;
   float beta;
   float estimate;
+  float rateEstimate;
   float previousEstimate = 0;
   float previousRateEstimate = 0;
   rclcpp::Time prevMeasureTime = rclcpp::Time(0);
