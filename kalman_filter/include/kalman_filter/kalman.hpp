@@ -15,6 +15,7 @@ using Range = sensor_msgs::msg::Range;
 typedef struct {
   float alpha;
   float beta;
+  float estimate;
   float previousEstimate;
   float previousRateEstimate;
   rclcpp::Time prevMeasureTime;
@@ -28,6 +29,9 @@ public:
 private:
 float H; // height from the ground to the fixed base of the robot [mm]
 AlphaBetaFilter rangeFilter;
+AlphaBetaFilter tempFilter;
+
+void applyAlphaBetaFilter(float z, AlphaBetaFilter &filter);
 
 void imu_callback(const sensor_msgs::msg::Imu::SharedPtr msg);
 void mag_callback(const sensor_msgs::msg::MagneticField::SharedPtr msg);
@@ -48,7 +52,6 @@ rclcpp::Publisher<Temp>::SharedPtr filtered_temp_pub;
 rclcpp::Publisher<Range>::SharedPtr filtered_range_pub;
 
 rclcpp::TimerBase::SharedPtr timer;
-float timer_freq; // [Hz]
 };
 
 #endif // !KALMAN_HPP

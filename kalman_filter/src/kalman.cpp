@@ -17,20 +17,29 @@ typedef struct {
 
 KalmanFilter::KalmanFilter() : Node("kalman_filter") {
   // Declare parameters
-  this->timer_freq = this->declare_parameter("timer_frequency", 100.0); // [Hz]
+  float timer_freq = this->declare_parameter("timer_frequency", 100.0); // [Hz]
   this->H = this->declare_parameter("ground_to_base_height", 400.0); // [mm]
   this->rangeFilter.alpha = this->declare_parameter("range_filter_alpha", 0.1);
   this->rangeFilter.beta = this->declare_parameter("range_filter_beta", 0.01);
+  this->tempFilter.alpha = this->declare_parameter("temp_filter_alpha", 0.1);
+  this->tempFilter.beta = this->declare_parameter("temp_filter_beta", 0.01);
   // Get parameters from yaml file
-  this->timer_freq = this->get_parameter("timer_frequency").as_double();
+  timer_freq = this->get_parameter("timer_frequency").as_double();
   this->H = this->get_parameter("ground_to_base_height").as_double();
   this->rangeFilter.alpha = this->get_parameter("range_filter_alpha").as_double();
   this->rangeFilter.beta = this->get_parameter("range_filter_beta").as_double();
+  this->tempFilter.alpha = this->get_parameter("temp_filter_alpha").as_double();
+  this->tempFilter.beta = this->get_parameter("temp_filter_beta").as_double();
   
   // Setup RangeFilter
   this->rangeFilter.prevMeasureTime = this->now();
   this->rangeFilter.previousEstimate = 0;
   this->rangeFilter.previousRateEstimate = 0;
+
+  // Setup TempFilter
+  this->tempFilter.prevMeasureTime = this->now();
+  this->tempFilter.previousEstimate = 0;
+  this->tempFilter.previousRateEstimate = 0;
 
   // Raw data Topics
   const std::string imu_raw_topic = "bno055/raw_imu";
@@ -74,13 +83,32 @@ KalmanFilter::KalmanFilter() : Node("kalman_filter") {
 
   // Create a timer to run the filter
   this->timer = this->create_wall_timer(
-    std::chrono::duration<double>(1.0 / this->timer_freq), // [s]
+    std::chrono::duration<double>(1.0 / timer_freq), // [s]
     std::bind(&KalmanFilter::timer_callback, this)
   );
 }
 
 void KalmanFilter::timer_callback() {
 
+}
+
+void KalmanFilter::applyAlphaBetaFilter(float z, AlphaBetaFilter& filter) {
+  // Update Timestep and save the previous measurement time
+  float dt = (this->now() - filter.prevMeasureTime).seconds();
+  filter.prevMeasureTime = this->now();
+
+  // Prediction Step
+  float dx = filter.previousRateEstimate;
+  filter.estimate = filter.previousEstimate + (dx * dt);
+  
+  // Update Step
+  float residual = z - filter.estimate;
+  filter.estimate += filter.alpha * residual;
+  dx += filter.beta * (residual / dt);
+
+  // Update the filter state
+  filter.previousRateEstimate = dx;
+  filter.previousEstimate = filter.estimate;
 }
 
 void KalmanFilter::imu_callback(const IMU::SharedPtr msg) {
@@ -92,7 +120,18 @@ void KalmanFilter::mag_callback(const MagField::SharedPtr msg) {
 }
 
 void KalmanFilter::temp_callback(const Temp::SharedPtr msg) {
-  (void)msg;
+  // Alpha-Beta Filter for Temperature data from BNO055 Sensor
+  if (this->tempFilter.previousEstimate == 0 && this->tempFilter.previousRateEstimate == 0) {
+    this->tempFilter.previousEstimate = msg->temperature; // Initial Guess
+  }
+
+  this->applyAlphaBetaFilter(msg->temperature, this->tempFilter);
+
+  // Publish the filtered temperature value
+  auto filtered_msg = std::make_shared<Temp>(*msg);
+  filtered_msg->temperature = this->tempFilter.estimate; // Update the temperature value to the filtered value
+  filtered_msg->header.stamp = this->now(); // Update the timestamp to the current time
+  this->filtered_temp_pub->publish(*filtered_msg);
 }
 
 void KalmanFilter::range_callback(const Range::SharedPtr msg) {
@@ -101,24 +140,11 @@ void KalmanFilter::range_callback(const Range::SharedPtr msg) {
     this->rangeFilter.previousEstimate = msg->range; // Initial Guess
   }
 
-  // Update Timestep and save the previous measurement time
-  float dt = (rclcpp::Time(msg->header.stamp) - this->rangeFilter.prevMeasureTime).seconds();
-  this->rangeFilter.prevMeasureTime = msg->header.stamp;
-
-  // Prediction Step
-  float dx = this->rangeFilter.previousRateEstimate;
-  float x = this->rangeFilter.previousEstimate + (dx * dt);
-  this->rangeFilter.previousEstimate = x;
-
-  // Update Step
-  float residual = msg->range - x;
-  x += this->rangeFilter.alpha * residual;
-  dx += this->rangeFilter.beta * (residual / dt);
-  this->rangeFilter.previousRateEstimate = dx;
+  this->applyAlphaBetaFilter(msg->range, this->rangeFilter);
 
   // Publish the filtered range value
   auto filtered_msg = std::make_shared<Range>(*msg);
-  filtered_msg->range = x; // Update the range value to the filtered value
+  filtered_msg->range = this->rangeFilter.estimate; // Update the range value to the filtered value
   filtered_msg->header.stamp = this->now(); // Update the timestamp to the current time
   // Only publish the filtered range if it is within the min and max range values
   if ((filtered_msg->range >= filtered_msg->min_range) && (filtered_msg->range <= filtered_msg->max_range)) {

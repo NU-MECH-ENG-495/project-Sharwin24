@@ -12,3 +12,5 @@ kalman_filter:
     ground_to_base_height: 400.81087 # [mm]
     range_filter_alpha: 0.3
     range_filter_beta: 0.025
+    temp_filter_alpha: 0.5
+    temp_filter_beta: 0.01
