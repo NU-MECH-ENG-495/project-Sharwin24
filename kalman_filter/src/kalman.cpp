@@ -72,14 +72,12 @@ KalmanFilter::KalmanFilter() : Node("kalman_filter") {
   );
 
   // Create a timer to run the filter
-  this->timer = this->create_wall_timer(
+  auto timer = this->create_wall_timer(
     std::chrono::duration<double>(1.0 / timer_freq), // [s]
-    std::bind(&KalmanFilter::timer_callback, this)
+    [this]() -> void {
+      // Run the Kalman Filter
+    }
   );
-}
-
-void KalmanFilter::timer_callback() {
-
 }
 
 void KalmanFilter::applyAlphaBetaFilter(float z, AlphaBetaFilter& filter) {
