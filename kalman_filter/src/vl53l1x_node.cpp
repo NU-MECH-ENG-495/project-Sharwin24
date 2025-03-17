@@ -50,7 +50,7 @@ VL53L1XNode::VL53L1XNode() : Node("VL53L1X_Sensor") {
         RCLCPP_ERROR(this->get_logger(), "Timeout Occured!");
         distance = 0;
       }
-      rclcpp::Time now = this->get_clock()->now();
+      rclcpp::Time now = this->now();
       sensor_msgs::msg::Range msg;
       msg.header.frame_id = "VL53L1X_frame";
       msg.header.stamp = now;

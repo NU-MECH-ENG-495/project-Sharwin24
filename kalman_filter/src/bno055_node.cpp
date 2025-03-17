@@ -42,7 +42,7 @@ BNO055Node::BNO055Node() : Node("BNO055_Sensor") {
     std::chrono::duration<double>(1.0 / this->sensor_freq), // [s]
     [this]() -> void {
       IMURecord record = this->sensor.read();
-      const std::string sensor_frame_id = "imu_frame";
+      const std::string sensor_frame_id = "BNO055_frame";
 
       // IMU data
       sensor_msgs::msg::Imu imu_msg;

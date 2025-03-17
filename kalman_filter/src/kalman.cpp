@@ -112,8 +112,8 @@ void KalmanFilter::range_callback(const Range::SharedPtr msg) {
 
   // Update Step
   float residual = msg->range - x;
-  dx += this->rangeFilter.beta * (residual / dt);
   x += this->rangeFilter.alpha * residual;
+  dx += this->rangeFilter.beta * (residual / dt);
   this->rangeFilter.previousRateEstimate = dx;
 
   // Publish the filtered range value
