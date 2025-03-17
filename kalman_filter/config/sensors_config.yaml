@@ -8,3 +8,4 @@ imu_sensor:
 kalman_filter:
   ros__parameters:
     timer_frequency: 100.0 # [Hz]
+    ground_to_base_height: 400.81087 # [mm]

@@ -8,6 +8,7 @@ using Temp = sensor_msgs::msg::Temperature;
 using Range = sensor_msgs::msg::Range;
 
 typedef struct {
+  rclcpp::Time timestamp; // timestamp of the state vector
   float x; // x position of the end effector [mm]
   float y; // y position of the end effector [mm]
   float z; // z position of the end effector [mm]
@@ -19,11 +20,13 @@ typedef struct {
   float z_ddot; // z acceleration of the end effector [mm/s^2]
 } StateVector;
 
-KalmanFilter::KalmanFilter() : Node("Kalman_Filter") {
+KalmanFilter::KalmanFilter() : Node("kalman_filter") {
   // Declare parameters
   this->timer_freq = this->declare_parameter("timer_frequency", 100.0); // [Hz]
-  // Get parameter from yaml file
+  this->H = this->declare_parameter("ground_to_base_height", 400.0); // [mm]
+  // Get parameters from yaml file
   this->timer_freq = this->get_parameter("timer_frequency").as_double();
+  this->H = this->get_parameter("ground_to_base_height").as_double();
 
   // Topics
   const std::string imu_topic = "bno055/imu";

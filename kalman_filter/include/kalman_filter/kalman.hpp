@@ -18,6 +18,8 @@ public:
   ~KalmanFilter() = default;
 
 private:
+float H; // height from the ground to the fixed base of the robot [mm]
+
 void imu_callback(const sensor_msgs::msg::Imu::SharedPtr msg);
 void mag_callback(const sensor_msgs::msg::MagneticField::SharedPtr msg);
 void temp_callback(const sensor_msgs::msg::Temperature::SharedPtr msg);
