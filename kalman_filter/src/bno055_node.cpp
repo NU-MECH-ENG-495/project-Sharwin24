@@ -25,9 +25,9 @@ BNO055Node::BNO055Node() : Node("BNO055_Sensor") {
   RCLCPP_INFO(this->get_logger(), "BNO055 Sensor online!");
 
   // Topics
-  const std::string imu_topic = "bno055/imu";
-  const std::string mag_topic = "bno055/mag";
-  const std::string temp_topic = "bno055/temp";
+  const std::string imu_topic = "bno055/raw_imu";
+  const std::string mag_topic = "bno055/raw_mag";
+  const std::string temp_topic = "bno055/raw_temp";
 
   // Initialize the publishers
   this->imu_pub = this->create_publisher<sensor_msgs::msg::Imu>(imu_topic, 10);
