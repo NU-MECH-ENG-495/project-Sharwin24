@@ -9,9 +9,9 @@
 
 BNO055Node::BNO055Node() : Node("BNO055_Sensor") {
   // Declare parameters
-  this->sensor_freq = this->declare_parameter("sensor_freq", 100.0); // [Hz]
+  float sensor_freq = this->declare_parameter("sensor_freq", 100.0); // [Hz]
   // Get parameter from yaml file
-  this->sensor_freq = this->get_parameter("sensor_freq").as_double();
+  sensor_freq = this->get_parameter("sensor_freq").as_double();
 
   // Initialize the BNO055 sensor
   try {
@@ -35,11 +35,11 @@ BNO055Node::BNO055Node() : Node("BNO055_Sensor") {
   this->temp_pub = this->create_publisher<sensor_msgs::msg::Temperature>(temp_topic, 10);
 
   RCLCPP_INFO(this->get_logger(), "BNO055 Sensor publishing on topics: (%s), (%s), (%s) at %.1f Hz",
-    imu_topic.c_str(), mag_topic.c_str(), temp_topic.c_str(), this->sensor_freq);
+    imu_topic.c_str(), mag_topic.c_str(), temp_topic.c_str(), sensor_freq);
 
   // Create a timer with a 100ms period to read and publish
-  this->timer = this->create_wall_timer(
-    std::chrono::duration<double>(1.0 / this->sensor_freq), // [s]
+  auto timer = this->create_wall_timer(
+    std::chrono::duration<double>(1.0 / sensor_freq), // [s]
     [this]() -> void {
       IMURecord record = this->sensor.read();
       const std::string sensor_frame_id = "BNO055_frame";
@@ -74,9 +74,9 @@ BNO055Node::BNO055Node() : Node("BNO055_Sensor") {
       temp_msg.temperature = record.temperature;
 
       // Publish the data
-      imu_pub->publish(imu_msg);
-      mag_pub->publish(mag_msg);
-      temp_pub->publish(temp_msg);
+      this->imu_pub->publish(imu_msg);
+      this->mag_pub->publish(mag_msg);
+      this->temp_pub->publish(temp_msg);
     }
   );
 }

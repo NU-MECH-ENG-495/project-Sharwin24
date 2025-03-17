@@ -34,16 +34,16 @@ AlphaBetaFilter tempFilter;
 
 void applyAlphaBetaFilter(float z, AlphaBetaFilter &filter);
 
-void imu_callback(const sensor_msgs::msg::Imu::SharedPtr msg);
-void mag_callback(const sensor_msgs::msg::MagneticField::SharedPtr msg);
-void temp_callback(const sensor_msgs::msg::Temperature::SharedPtr msg);
-void range_callback(const sensor_msgs::msg::Range::SharedPtr msg);
+void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
+void magCallback(const sensor_msgs::msg::MagneticField::SharedPtr msg);
+void tempCallback(const sensor_msgs::msg::Temperature::SharedPtr msg);
+void rangeCallback(const sensor_msgs::msg::Range::SharedPtr msg);
 
 // Raw data subscriptions
-rclcpp::Subscription<IMU>::SharedPtr imu_subscription_;
-rclcpp::Subscription<MagField>::SharedPtr mag_subscription_;
-rclcpp::Subscription<Temp>::SharedPtr temp_subscription_;
-rclcpp::Subscription<Range>::SharedPtr range_subscription_;
+rclcpp::Subscription<IMU>::SharedPtr raw_imu_sub;
+rclcpp::Subscription<MagField>::SharedPtr raw_mag_sub;
+rclcpp::Subscription<Temp>::SharedPtr raw_temp_sub;
+rclcpp::Subscription<Range>::SharedPtr raw_range_sub;
 
 // Filtered data publishers
 rclcpp::Publisher<IMU>::SharedPtr filtered_imu_pub;

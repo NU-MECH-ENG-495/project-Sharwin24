@@ -48,14 +48,14 @@ KalmanFilter::KalmanFilter() : Node("kalman_filter") {
   auto filteredQos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
 
   // Initialize the subscribers
-  this->imu_subscription_ = this->create_subscription<IMU>(
-    imu_raw_topic, QoS, std::bind(&KalmanFilter::imu_callback, this, std::placeholders::_1));
-  this->mag_subscription_ = this->create_subscription<MagField>(
-    mag_raw_topic, QoS, std::bind(&KalmanFilter::mag_callback, this, std::placeholders::_1));
-  this->temp_subscription_ = this->create_subscription<Temp>(
-    temp_raw_topic, QoS, std::bind(&KalmanFilter::temp_callback, this, std::placeholders::_1));
-  this->range_subscription_ = this->create_subscription<Range>(
-    range_raw_topic, QoS, std::bind(&KalmanFilter::range_callback, this, std::placeholders::_1));
+  this->raw_imu_sub = this->create_subscription<IMU>(
+    imu_raw_topic, QoS, std::bind(&KalmanFilter::imuCallback, this, std::placeholders::_1));
+  this->raw_mag_sub = this->create_subscription<MagField>(
+    mag_raw_topic, QoS, std::bind(&KalmanFilter::magCallback, this, std::placeholders::_1));
+  this->raw_temp_sub = this->create_subscription<Temp>(
+    temp_raw_topic, QoS, std::bind(&KalmanFilter::tempCallback, this, std::placeholders::_1));
+  this->raw_range_sub = this->create_subscription<Range>(
+    range_raw_topic, QoS, std::bind(&KalmanFilter::rangeCallback, this, std::placeholders::_1));
 
   // Initialize Publishers
   this->filtered_imu_pub = this->create_publisher<IMU>(imu_filtered_topic, filteredQos);
@@ -98,15 +98,15 @@ void KalmanFilter::applyAlphaBetaFilter(float z, AlphaBetaFilter& filter) {
   filter.previousEstimate = filter.estimate;
 }
 
-void KalmanFilter::imu_callback(const IMU::SharedPtr msg) {
+void KalmanFilter::imuCallback(const IMU::SharedPtr msg) {
   (void)msg;
 }
 
-void KalmanFilter::mag_callback(const MagField::SharedPtr msg) {
+void KalmanFilter::magCallback(const MagField::SharedPtr msg) {
   (void)msg;
 }
 
-void KalmanFilter::temp_callback(const Temp::SharedPtr msg) {
+void KalmanFilter::tempCallback(const Temp::SharedPtr msg) {
   // Alpha-Beta Filter for Temperature data from BNO055 Sensor
   if (this->tempFilter.previousEstimate == 0 && this->tempFilter.previousRateEstimate == 0) {
     this->tempFilter.previousEstimate = msg->temperature; // Initial Guess
@@ -121,7 +121,7 @@ void KalmanFilter::temp_callback(const Temp::SharedPtr msg) {
   this->filtered_temp_pub->publish(*filtered_msg);
 }
 
-void KalmanFilter::range_callback(const Range::SharedPtr msg) {
+void KalmanFilter::rangeCallback(const Range::SharedPtr msg) {
   // Alpha-Beta Filter for Range Data from Time-of-Flight Sensor
   if (this->rangeFilter.previousEstimate == 0 && this->rangeFilter.previousRateEstimate == 0) {
     this->rangeFilter.previousEstimate = msg->range; // Initial Guess

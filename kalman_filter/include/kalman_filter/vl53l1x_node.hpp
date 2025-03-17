@@ -16,9 +16,9 @@ public:
   ~VL53L1XNode();
 
 private:
-  rclcpp::TimerBase::SharedPtr timer;
-  rclcpp::Publisher<sensor_msgs::msg::Range>::SharedPtr sensor_pub;
   VL53L1X sensor;
+  
+  rclcpp::Publisher<sensor_msgs::msg::Range>::SharedPtr sensor_pub;
 };
 
 #endif // !VL53L1X_NODE_HPP
