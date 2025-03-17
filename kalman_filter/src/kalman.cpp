@@ -68,6 +68,10 @@ KalmanFilter::KalmanFilter() : Node("kalman_filter") {
     imu_raw_topic.c_str(), mag_raw_topic.c_str(), temp_raw_topic.c_str(), range_raw_topic.c_str()
   );
 
+  RCLCPP_INFO(this->get_logger(), "Kalman Filter publishing filtered data on topics: (%s), (%s), (%s), (%s)",
+    imu_filtered_topic.c_str(), mag_filtered_topic.c_str(), temp_filtered_topic.c_str(), range_filtered_topic.c_str()
+  );
+
   // Create a timer to run the filter
   this->timer = this->create_wall_timer(
     std::chrono::duration<double>(1.0 / this->timer_freq), // [s]
@@ -102,7 +106,7 @@ void KalmanFilter::range_callback(const Range::SharedPtr msg) {
 
   // Prediction Step
   float dx = this->rangeFilter.previousRateEstimate;
-  float x = this->rangeFilter.previousEstimate + dx * dt;
+  float x = this->rangeFilter.previousEstimate + (dx * dt);
 
   // Update Step
   float residual = msg->range - x;
