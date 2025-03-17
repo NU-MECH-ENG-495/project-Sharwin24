@@ -75,6 +75,7 @@ void KalmanFilter::temp_callback(const sensor_msgs::msg::Temperature::SharedPtr 
 
 void KalmanFilter::range_callback(const sensor_msgs::msg::Range::SharedPtr msg) {
   (void)msg;
+  // Use G-H filter to filter range measurements
 }
 
 int main(int argc, char *argv[]) {
