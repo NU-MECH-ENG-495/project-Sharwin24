@@ -12,16 +12,16 @@
 
 VL53L1XNode::VL53L1XNode() : Node("VL53L1X_Sensor") {
   // Declare Parameters
-  this->sensor_timeout_ms = this->declare_parameter("sensor_timeout_ms", 500);
-  this->sensor_freq = this->declare_parameter("sensor_frequency", 25.0);
+  float sensor_timeout_ms = this->declare_parameter("sensor_timeout_ms", 500);
+  float sensor_freq = this->declare_parameter("sensor_frequency", 25.0);
+  float timing_budget_ms = this->declare_parameter("timing_budget_ms", 20.0); // 20ms for Short distance mode
   // Get parameters from config file
-  this->sensor_timeout_ms = this->get_parameter("sensor_timeout_ms").as_int();
-  this->sensor_freq = this->get_parameter("sensor_frequency").as_double();
+  sensor_timeout_ms = this->get_parameter("sensor_timeout_ms").as_int();
+  sensor_freq = this->get_parameter("sensor_frequency").as_double();
+  timing_budget_ms = this->get_parameter("timing_budget_ms").as_double();
 
   // Ensure the sensor frequency does not exceed 50Hz
-  if (this->sensor_freq > 50.0) {
-    this->sensor_freq = 50.0;
-  }
+  if (sensor_freq > 50.0) { sensor_freq = 50.0; }
 
   if (!this->sensor.init()) {
     rclcpp::shutdown();
@@ -30,20 +30,20 @@ VL53L1XNode::VL53L1XNode() : Node("VL53L1X_Sensor") {
 
   RCLCPP_INFO(this->get_logger(), "VL53L1X Sensor online!");
 
-  // Set a 500ms timeout on the sensor. (Stop waiting and respond with an error)
+  // Set a timeout on the sensor. (Stop waiting and respond with an error)
   this->sensor.setTimeout(sensor_timeout_ms);
   this->sensor.setDistanceMode(VL53L1X::DistanceMode::Short);
-  this->sensor.setMeasurementTimingBudget(20000); // 20ms for Short distance mode
-  this->sensor.startContinuous(static_cast<int>(1000.0 / this->sensor_freq));  // Hardcode testcase 100
+  this->sensor.setMeasurementTimingBudget(timing_budget_ms * 1000);  // Convert ms to us
+  this->sensor.startContinuous(static_cast<int>(1000.0 / sensor_freq));  // Hardcode testcase 100
 
   // Setup the publisher
   const std::string topic = "vl53l1x/raw_range";
   sensor_pub = this->create_publisher<sensor_msgs::msg::Range>(topic, 5);
-  RCLCPP_INFO(this->get_logger(), "VL53L1X Sensor publishing on topic (%s) at %.1f Hz", topic.c_str(), this->sensor_freq);
+  RCLCPP_INFO(this->get_logger(), "VL53L1X Sensor publishing on topic (%s) at %.1f Hz", topic.c_str(), sensor_freq);
 
   // Create a timer to publish the sensor data
   this->timer = this->create_wall_timer(
-    std::chrono::duration<double>(1.0 / this->sensor_freq), // [s]
+    std::chrono::duration<double>(1.0 / sensor_freq), // [s]
     [this]() -> void {
       uint16_t distance = this->sensor.read_range();
       if (this->sensor.timeoutOccurred()) {

@@ -19,8 +19,6 @@ private:
   rclcpp::TimerBase::SharedPtr timer;
   rclcpp::Publisher<sensor_msgs::msg::Range>::SharedPtr sensor_pub;
   VL53L1X sensor;
-  unsigned int sensor_timeout_ms;
-  double sensor_freq;
 };
 
 #endif // !VL53L1X_NODE_HPP

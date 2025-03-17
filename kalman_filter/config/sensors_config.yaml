@@ -2,6 +2,7 @@ tof_sensor:
   ros__parameters:
     sensor_timeout_ms: 500 # [ms]
     sensor_frequency: 48.0 # [Hz]
+    sensor_timing_budget_ms: 20 # [ms]
 imu_sensor:
   ros__parameters:
     sensor_frequency: 100.0 # [Hz]
