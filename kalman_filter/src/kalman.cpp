@@ -96,6 +96,7 @@ void KalmanFilter::temp_callback(const Temp::SharedPtr msg) {
 }
 
 void KalmanFilter::range_callback(const Range::SharedPtr msg) {
+  // Alpha-Beta Filter for Range Data from Time-of-Flight Sensor
   if (this->rangeFilter.previousEstimate == 0 && this->rangeFilter.previousRateEstimate == 0) {
     this->rangeFilter.previousEstimate = msg->range; // Initial Guess
   }
@@ -107,11 +108,13 @@ void KalmanFilter::range_callback(const Range::SharedPtr msg) {
   // Prediction Step
   float dx = this->rangeFilter.previousRateEstimate;
   float x = this->rangeFilter.previousEstimate + (dx * dt);
+  this->rangeFilter.previousEstimate = x;
 
   // Update Step
   float residual = msg->range - x;
   dx += this->rangeFilter.beta * (residual / dt);
   x += this->rangeFilter.alpha * residual;
+  this->rangeFilter.previousRateEstimate = dx;
 
   // Publish the filtered range value
   auto filtered_msg = std::make_shared<Range>(*msg);
