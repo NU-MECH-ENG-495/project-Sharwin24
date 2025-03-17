@@ -19,8 +19,8 @@ KalmanFilter::KalmanFilter() : Node("kalman_filter") {
   // Declare parameters
   this->timer_freq = this->declare_parameter("timer_frequency", 100.0); // [Hz]
   this->H = this->declare_parameter("ground_to_base_height", 400.0); // [mm]
-  float alpha = this->declare_parameter("range_filter_alpha", 0.5);
-  float beta = this->declare_parameter("range_filter_beta", 0.5);
+  this->rangeFilter.alpha = this->declare_parameter("range_filter_alpha", 0.1);
+  this->rangeFilter.beta = this->declare_parameter("range_filter_beta", 0.01);
   // Get parameters from yaml file
   this->timer_freq = this->get_parameter("timer_frequency").as_double();
   this->H = this->get_parameter("ground_to_base_height").as_double();
