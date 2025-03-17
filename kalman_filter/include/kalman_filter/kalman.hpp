@@ -16,9 +16,9 @@ typedef struct {
   float alpha;
   float beta;
   float estimate;
-  float previousEstimate;
-  float previousRateEstimate;
-  rclcpp::Time prevMeasureTime;
+  float previousEstimate = 0;
+  float previousRateEstimate = 0;
+  rclcpp::Time prevMeasureTime = rclcpp::Time(0);
 } AlphaBetaFilter;
 
 class KalmanFilter : public rclcpp::Node {

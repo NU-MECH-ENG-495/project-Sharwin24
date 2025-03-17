@@ -30,16 +30,6 @@ KalmanFilter::KalmanFilter() : Node("kalman_filter") {
   this->rangeFilter.beta = this->get_parameter("range_filter_beta").as_double();
   this->tempFilter.alpha = this->get_parameter("temp_filter_alpha").as_double();
   this->tempFilter.beta = this->get_parameter("temp_filter_beta").as_double();
-  
-  // Setup RangeFilter
-  this->rangeFilter.prevMeasureTime = this->now();
-  this->rangeFilter.previousEstimate = 0;
-  this->rangeFilter.previousRateEstimate = 0;
-
-  // Setup TempFilter
-  this->tempFilter.prevMeasureTime = this->now();
-  this->tempFilter.previousEstimate = 0;
-  this->tempFilter.previousRateEstimate = 0;
 
   // Raw data Topics
   const std::string imu_raw_topic = "bno055/raw_imu";
