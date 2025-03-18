@@ -47,26 +47,26 @@ KalmanFilter::KalmanFilter() : Node("kalman") {
   const std::string temp_filtered_topic = "bno055/filtered_temp";
   const std::string range_filtered_topic = "vl53l1x/filtered_range";
 
-  // Set the QoS for the subscribers for receiving raw sensor data
-  auto QoS = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
-  // Set the QoS for the publishers for publishing filtered sensor data
-  auto filteredQos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
+  // Raw Sensor Data (Subscribers)
+  auto rawDataQoS = rclcpp::QoS(rclcpp::KeepLast(5)).best_effort().durability_volatile();
+  // Filtered Sensor Data (Publishers)
+  auto filteredDataQoS = rclcpp::QoS(rclcpp::KeepLast(10)).reliable().durability_volatile();
 
   // Initialize the subscribers
   this->raw_imu_sub = this->create_subscription<IMU>(
-    imu_raw_topic, QoS, std::bind(&KalmanFilter::imuCallback, this, std::placeholders::_1));
+    imu_raw_topic, rawDataQoS, std::bind(&KalmanFilter::imuCallback, this, std::placeholders::_1));
   this->raw_mag_sub = this->create_subscription<MagField>(
-    mag_raw_topic, QoS, std::bind(&KalmanFilter::magCallback, this, std::placeholders::_1));
+    mag_raw_topic, rawDataQoS, std::bind(&KalmanFilter::magCallback, this, std::placeholders::_1));
   this->raw_temp_sub = this->create_subscription<Temp>(
-    temp_raw_topic, QoS, std::bind(&KalmanFilter::tempCallback, this, std::placeholders::_1));
+    temp_raw_topic, rawDataQoS, std::bind(&KalmanFilter::tempCallback, this, std::placeholders::_1));
   this->raw_range_sub = this->create_subscription<Range>(
-    range_raw_topic, QoS, std::bind(&KalmanFilter::rangeCallback, this, std::placeholders::_1));
+    range_raw_topic, rawDataQoS, std::bind(&KalmanFilter::rangeCallback, this, std::placeholders::_1));
 
   // Initialize Publishers
-  this->filtered_imu_pub = this->create_publisher<IMU>(imu_filtered_topic, filteredQos);
-  this->filtered_mag_pub = this->create_publisher<MagField>(mag_filtered_topic, filteredQos);
-  this->filtered_temp_pub = this->create_publisher<Temp>(temp_filtered_topic, filteredQos);
-  this->filtered_range_pub = this->create_publisher<Range>(range_filtered_topic, filteredQos);
+  this->filtered_imu_pub = this->create_publisher<IMU>(imu_filtered_topic, filteredDataQoS);
+  this->filtered_mag_pub = this->create_publisher<MagField>(mag_filtered_topic, filteredDataQoS);
+  this->filtered_temp_pub = this->create_publisher<Temp>(temp_filtered_topic, filteredDataQoS);
+  this->filtered_range_pub = this->create_publisher<Range>(range_filtered_topic, filteredDataQoS);
 
   // Log topics being used
   RCLCPP_INFO(this->get_logger(), "Kalman Filter subscribing to raw data on topics: (%s), (%s), (%s), (%s)",
