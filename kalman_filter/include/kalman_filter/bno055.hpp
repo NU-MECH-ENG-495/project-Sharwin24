@@ -82,7 +82,7 @@ public:
   void init(std::string i2c_dev, uint8_t i2c_addr);
 
   /**
-   * @brief Resets the sensor
+   * @brief Attempts to reset the sensor
    *
    * @return true if the reset was successful
    * @return false if the reset failed for any reason

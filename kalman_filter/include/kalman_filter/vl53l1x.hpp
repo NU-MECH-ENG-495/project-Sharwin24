@@ -14,12 +14,35 @@
 
 #include "vl53l1x_registers.hpp"
 
+/**
+ * @class VL53L1X
+ * @brief Class for interfacing with the VL53L1X time-of-flight sensor over I2C.
+ *
+ */
 class VL53L1X {
 public:
+  /**
+   * @brief Constructor for the VL53L1X class.
+   */
   VL53L1X();
+
+  /**
+   * @brief Destructor for the VL53L1X class.
+   */
   ~VL53L1X() = default;
 
+  /**
+   * @brief Enum for the distance mode of the sensor.
+   * @note The options are Short, Medium, Long, and Unknown.
+   * Each mode has different timing budgets and accuracy.
+   *
+   */
   enum DistanceMode { Short, Medium, Long, Unknown };
+
+  /**
+   * @brief Enum for the status of the sensor reading.
+   *
+   */
   enum RangeStatus : uint8_t {
     RangeValid = 0,
 
@@ -77,35 +100,131 @@ public:
     None = 255,
   };
 
+  /**
+   * @brief Struct for packaging the range data obtained over an I2C read.
+   *
+   */
   struct RangingData {
-    uint16_t range_mm;
-    RangeStatus range_status;
-    float peak_signal_count_rate_MCPS;
-    float ambient_count_rate_MCPS;
+    uint16_t range_mm; // range reading in millimeters
+    RangeStatus range_status; // The status of the range reading
+    float peak_signal_count_rate_MCPS; // peak signal count rate in MCPS
+    float ambient_count_rate_MCPS; // ambient count rate in MCPS
   };
 
+  /**
+   * @brief The most recent ranging data obtained from the sensor.
+   *
+   */
   RangingData ranging_data;
 
+  /**
+   * @brief Attempts to initialize the sensor and establishes communication over I2C.
+   *
+   * @return true if the initialization was successful
+   * @return false if the initialization failed for any reason
+   */
   bool init();
+
+  /**
+   * @brief Sets the I2C address of the sensor.
+   *
+   * @param new_addr the new I2C address to set
+   */
   void setAddress(uint8_t new_addr);
 
+  /**
+   * @brief Set the distance mode of the sensor.
+   *
+   * @param mode the enum value for the distance mode
+   * @return true if the distance mode was set successfully
+   * @return false if an invalid distance mode was provided
+   */
   bool setDistanceMode(DistanceMode mode);
+
+  /**
+   * @brief Gets the current distance mode of the sensor.
+   *
+   * @return DistanceMode the current distance mode of the sensor as an enum
+   */
   DistanceMode getDistanceMode() { return distance_mode; }
 
+  /**
+   * @brief Sets the timing budget of the sensor, which is the amount of time
+   * the sensor is budgeted to make a reading. A higher timing budget allows for
+   * more accurate readings but induces more latency with each reading.
+   *
+   * @note Each distance mode has different ranges of timing budgets:
+   * Short: 20-33 ms, Medium: 33-50 ms, Long: 50-100 ms, Unknown: 33-100 ms
+   *
+   * @param budget_us the amount of time to budget the sensor to make a reading [us]
+   * @return true if the given timing budget was set successfully
+   * @return false if the given timing budget was invalid
+   */
   bool setMeasurementTimingBudget(uint32_t budget_us);
+
+  /**
+   * @brief Gets the current timing budget of the sensor.
+   *
+   * @return uint32_t the timing budget in microseconds
+   */
   uint32_t getMeasurementTimingBudget();
 
+  /**
+   * @brief Start continuous range measurements with the given inter-measurement period.
+   *
+   * @param period_ms The amount of time [ms] between each range measurement
+   */
   void startContinuous(uint32_t period_ms);
+
+  /**
+   * @brief Stop continuous range measurements.
+   *
+   */
   void stopContinuous();
+
+  /**
+   * @brief Read the sensor and obtain the reading.
+   *
+   * @param blocking whether to block until a reading is available. Defaults to true.
+   * @return uint16_t the range reading [mm]
+   */
   uint16_t read_range(bool blocking = true);
 
+  /**
+   * @brief Perform a single range reading without continuous measurements.
+   *
+   * @param blocking whether to block until a reading is available.
+   * @return uint16_t the range reading [mm]
+   */
   uint16_t readSingle(bool blocking);
+
+  /**
+   * @brief Alias of readSingle()
+   *
+   */
   uint16_t readRangeSingleMillimeters(bool blocking = true) { return readSingle(blocking); } // alias of readSingle()
 
-  // check if sensor has new reading available
-  // assumes interrupt is active low (GPIO_HV_MUX__CTRL bit 4 is 1)
+  /**
+   * @brief Check if the sensor has a new reading available.
+   *
+   * @note assumes interrupt is active low (GPIO_HV_MUX__CTRL bit 4 is 1)
+   *
+   * @return true if a new reading is available
+   */
   bool dataReady() { return (readReg(GPIO__TIO_HV_STATUS) & 0x01) == 0; }
+
+  /**
+   * @brief Set the sensor timeout length
+   *
+   * @param timeout the amount of time to wait for a reading before timing out [ms]
+   */
   void setTimeout(uint16_t timeout) { io_timeout = timeout; }
+
+  /**
+   * @brief Check if a timeout has occurred since the last call to this function.
+   *
+   * @return true if a timeout has occurred when this function was called
+   */
   bool timeoutOccurred();
 private:
 
