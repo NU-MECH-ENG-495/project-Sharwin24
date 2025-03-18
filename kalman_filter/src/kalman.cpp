@@ -40,6 +40,7 @@ KalmanFilter::KalmanFilter() : Node("kalman") {
   const std::string mag_raw_topic = "bno055/raw_mag";
   const std::string temp_raw_topic = "bno055/raw_temp";
   const std::string range_raw_topic = "vl53l1x/raw_range";
+  const std::string robot_config_topic = "delta_robot/robot_config";
 
   // Filtered Data Topics
   const std::string imu_filtered_topic = "bno055/filtered_imu";
@@ -61,6 +62,8 @@ KalmanFilter::KalmanFilter() : Node("kalman") {
     temp_raw_topic, rawDataQoS, std::bind(&KalmanFilter::tempCallback, this, std::placeholders::_1));
   this->raw_range_sub = this->create_subscription<Range>(
     range_raw_topic, rawDataQoS, std::bind(&KalmanFilter::rangeCallback, this, std::placeholders::_1));
+  this->robot_config_sub = this->create_subscription<RobotConfig>(
+    robot_config_topic, rawDataQoS, std::bind(&KalmanFilter::robotConfigCallback, this, std::placeholders::_1));
 
   // Initialize Publishers
   this->filtered_imu_pub = this->create_publisher<IMU>(imu_filtered_topic, filteredDataQoS);
@@ -82,12 +85,13 @@ KalmanFilter::KalmanFilter() : Node("kalman") {
   );
 
   // Create a timer to run the filter
-  // auto timer = this->create_wall_timer(
-  //   std::chrono::duration<double>(1.0 / timer_freq), // [s]
-  //   [this]() -> void {
-  //     // Run the Kalman Filter
-  //   }
-  // );
+  this->timer = this->create_wall_timer(
+    std::chrono::duration<double>(1.0 / timer_freq), // [s]
+    std::bind(&KalmanFilter::timerCallback, this)
+  );
+}
+void KalmanFilter::timerCallback() {
+
 }
 
 void KalmanFilter::applyAlphaBetaFilter(float z, AlphaBetaFilter& filter) {
@@ -147,6 +151,10 @@ void KalmanFilter::rangeCallback(const Range::SharedPtr msg) {
   if ((filtered_msg->range >= filtered_msg->min_range) && (filtered_msg->range <= filtered_msg->max_range)) {
     this->filtered_range_pub->publish(*filtered_msg);
   }
+}
+
+void KalmanFilter::robotConfigCallback(const RobotConfig::SharedPtr msg) {
+  (void)msg;
 }
 
 int main(int argc, char* argv[]) {

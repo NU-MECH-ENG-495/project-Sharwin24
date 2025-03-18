@@ -18,11 +18,13 @@
 #include "sensor_msgs/msg/magnetic_field.hpp"
 #include "sensor_msgs/msg/temperature.hpp"
 #include "sensor_msgs/msg/range.hpp"
+#include "deltarobot_interfaces/msg/robot_config.hpp"
 
 using IMU = sensor_msgs::msg::Imu;
 using MagField = sensor_msgs::msg::MagneticField;
 using Temp = sensor_msgs::msg::Temperature;
 using Range = sensor_msgs::msg::Range;
+using RobotConfig = deltarobot_interfaces::msg::RobotConfig;
 
 /**
  * @struct AlphaBetaFilter
@@ -81,6 +83,12 @@ private:
   AlphaBetaFilter tempFilter; // Alpha-beta filter for temperature data
 
   /**
+   * @brief Timer callback for running kalman filter.
+   *
+   */
+  void timerCallback();
+
+  /**
    * @brief Apply the alpha-beta filter to a measurement.
    * @param z The measurement value.
    * @param filter The alpha-beta filter to apply and update.
@@ -111,11 +119,21 @@ private:
    */
   void rangeCallback(const sensor_msgs::msg::Range::SharedPtr msg);
 
+  /**
+   * @brief Callback function for robot configuration data.
+   *
+   * @param msg RobotConfig message containing end-effector position, joint angles and velocities.
+   */
+  void robotConfigCallback(const deltarobot_interfaces::msg::RobotConfig::SharedPtr msg);
+
+  rclcpp::TimerBase::SharedPtr timer; // Timer for running the kalman filter
+
   // Raw data subscriptions
   rclcpp::Subscription<IMU>::SharedPtr raw_imu_sub; // Subscription for raw IMU data
   rclcpp::Subscription<MagField>::SharedPtr raw_mag_sub; // Subscription for raw magnetic field data
   rclcpp::Subscription<Temp>::SharedPtr raw_temp_sub; // Subscription for raw temperature data
   rclcpp::Subscription<Range>::SharedPtr raw_range_sub; // Subscription for raw range data
+  rclcpp::Subscription<RobotConfig>::SharedPtr robot_config_sub; // Subscription for robot configuration data
 
   // Filtered data publishers
   rclcpp::Publisher<IMU>::SharedPtr filtered_imu_pub; // Publisher for filtered IMU data
