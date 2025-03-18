@@ -47,6 +47,7 @@ KalmanFilter::KalmanFilter() : Node("kalman") {
   const std::string mag_filtered_topic = "bno055/filtered_mag";
   const std::string temp_filtered_topic = "bno055/filtered_temp";
   const std::string range_filtered_topic = "vl53l1x/filtered_range";
+  const std::string range_filtered_error_topic = "vl53l1x/filtered_range_error";
 
   // Raw Sensor Data (Subscribers)
   auto rawDataQoS = rclcpp::QoS(rclcpp::KeepLast(5)).best_effort().durability_volatile();
@@ -62,14 +63,18 @@ KalmanFilter::KalmanFilter() : Node("kalman") {
     temp_raw_topic, rawDataQoS, std::bind(&KalmanFilter::tempCallback, this, std::placeholders::_1));
   this->raw_range_sub = this->create_subscription<Range>(
     range_raw_topic, rawDataQoS, std::bind(&KalmanFilter::rangeCallback, this, std::placeholders::_1));
-  this->robot_config_sub = this->create_subscription<RobotConfig>(
-    robot_config_topic, rawDataQoS, std::bind(&KalmanFilter::robotConfigCallback, this, std::placeholders::_1));
+  this->robot_config_sub = this->create_subscription<RobotConfig>(robot_config_topic, rawDataQoS,
+    [this](const RobotConfig::SharedPtr msg) -> void {
+    this->latestConfig = *msg;
+  }
+  );
 
   // Initialize Publishers
   this->filtered_imu_pub = this->create_publisher<IMU>(imu_filtered_topic, filteredDataQoS);
   this->filtered_mag_pub = this->create_publisher<MagField>(mag_filtered_topic, filteredDataQoS);
   this->filtered_temp_pub = this->create_publisher<Temp>(temp_filtered_topic, filteredDataQoS);
   this->filtered_range_pub = this->create_publisher<Range>(range_filtered_topic, filteredDataQoS);
+  this->filtered_range_error_pub = this->create_publisher<Float32>(range_filtered_error_topic, filteredDataQoS);
 
   // Log topics being used
   RCLCPP_INFO(this->get_logger(), "Kalman Filter subscribing to raw data on topics: (%s), (%s), (%s), (%s)",
@@ -91,7 +96,14 @@ KalmanFilter::KalmanFilter() : Node("kalman") {
   );
 }
 void KalmanFilter::timerCallback() {
-
+  // Assumming that Kinematics is our "truth", we can estimate the error of the range filter
+  // |EE.Z| + TOF = H (EE.Z should be a negative number so we take the absolute value)
+  float eeZ = this->latestConfig.end_effector_position.z;
+  float tof = this->rangeFilter.estimate * 1000; // Convert to mm
+  float error = this->H - (std::abs(eeZ) + tof);
+  auto error_msg = Float32();
+  error_msg.data = error;
+  this->filtered_range_error_pub->publish(error_msg);
 }
 
 void KalmanFilter::applyAlphaBetaFilter(float z, AlphaBetaFilter& filter) {
@@ -151,10 +163,6 @@ void KalmanFilter::rangeCallback(const Range::SharedPtr msg) {
   if ((filtered_msg->range >= filtered_msg->min_range) && (filtered_msg->range <= filtered_msg->max_range)) {
     this->filtered_range_pub->publish(*filtered_msg);
   }
-}
-
-void KalmanFilter::robotConfigCallback(const RobotConfig::SharedPtr msg) {
-  (void)msg;
 }
 
 int main(int argc, char* argv[]) {

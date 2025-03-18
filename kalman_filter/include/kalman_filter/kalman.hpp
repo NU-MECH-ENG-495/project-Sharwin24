@@ -14,6 +14,7 @@
 #define KALMAN_HPP
 
 #include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/float32.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/magnetic_field.hpp"
 #include "sensor_msgs/msg/temperature.hpp"
@@ -25,6 +26,7 @@ using MagField = sensor_msgs::msg::MagneticField;
 using Temp = sensor_msgs::msg::Temperature;
 using Range = sensor_msgs::msg::Range;
 using RobotConfig = deltarobot_interfaces::msg::RobotConfig;
+using Float32 = std_msgs::msg::Float32;
 
 /**
  * @struct AlphaBetaFilter
@@ -81,6 +83,7 @@ private:
   float H; // Height from the ground to the fixed base of the robot [mm]
   AlphaBetaFilter rangeFilter; // Alpha-beta filter for range data
   AlphaBetaFilter tempFilter; // Alpha-beta filter for temperature data
+  RobotConfig latestConfig;
 
   /**
    * @brief Timer callback for running kalman filter.
@@ -119,13 +122,6 @@ private:
    */
   void rangeCallback(const sensor_msgs::msg::Range::SharedPtr msg);
 
-  /**
-   * @brief Callback function for robot configuration data.
-   *
-   * @param msg RobotConfig message containing end-effector position, joint angles and velocities.
-   */
-  void robotConfigCallback(const deltarobot_interfaces::msg::RobotConfig::SharedPtr msg);
-
   rclcpp::TimerBase::SharedPtr timer; // Timer for running the kalman filter
 
   // Raw data subscriptions
@@ -140,6 +136,7 @@ private:
   rclcpp::Publisher<MagField>::SharedPtr filtered_mag_pub; // Publisher for filtered magnetic field data
   rclcpp::Publisher<Temp>::SharedPtr filtered_temp_pub; // Publisher for filtered temperature data
   rclcpp::Publisher<Range>::SharedPtr filtered_range_pub; // Publisher for filtered range data
+  rclcpp::Publisher<Float32>::SharedPtr filtered_range_error_pub; // Publisher for filtered range error data
 };
 
 #endif // !KALMAN_HPP

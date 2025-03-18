@@ -11,6 +11,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(Doxygen)
 find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(deltarobot_interfaces REQUIRED)
 
@@ -21,7 +22,7 @@ include_directories(
 
 # BN0055 Node
 add_executable(BNO055_Sensor src/bno055_node.cpp src/bno055.cpp)
-ament_target_dependencies(BNO055_Sensor rclcpp sensor_msgs deltarobot_interfaces)
+ament_target_dependencies(BNO055_Sensor rclcpp sensor_msgs)
 
 # VL53L1X Node
 add_executable(VL53L1X_Sensor src/vl53l1x_node.cpp src/vl53l1x.cpp)
@@ -29,7 +30,7 @@ ament_target_dependencies(VL53L1X_Sensor rclcpp sensor_msgs)
 
 # Kalman Filter Node
 add_executable(kalman src/kalman.cpp)
-ament_target_dependencies(kalman rclcpp sensor_msgs)
+ament_target_dependencies(kalman rclcpp sensor_msgs deltarobot_interfaces)
 
 install(TARGETS
   VL53L1X_Sensor
