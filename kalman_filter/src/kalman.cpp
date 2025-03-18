@@ -49,6 +49,7 @@ KalmanFilter::KalmanFilter() : Node("kalman") {
 
   // Set the QoS for the subscribers for receiving raw sensor data
   auto QoS = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
+  // Set the QoS for the publishers for publishing filtered sensor data
   auto filteredQos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
 
   // Initialize the subscribers

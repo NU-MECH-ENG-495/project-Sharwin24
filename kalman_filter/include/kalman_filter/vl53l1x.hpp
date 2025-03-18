@@ -1,3 +1,12 @@
+/**
+ * @file vl53l1x.hpp
+ * @author Sharwin Patil (sharwinpatil@u.northwestern.edu)
+ * @brief Header file containing class definition for VL53L1X that interfaces with the sensor
+ * over I2C.
+ * @date 2025-03-18
+ *
+ */
+
 #ifndef VL53L1X_HPP
 #define VL53L1X_HPP
 
@@ -14,11 +23,11 @@
 
 #include "vl53l1x_registers.hpp"
 
-/**
- * @class VL53L1X
- * @brief Class for interfacing with the VL53L1X time-of-flight sensor over I2C.
- *
- */
+ /**
+  * @class VL53L1X
+  * @brief Class for interfacing with the VL53L1X time-of-flight sensor over I2C.
+  *
+  */
 class VL53L1X {
 public:
   /**

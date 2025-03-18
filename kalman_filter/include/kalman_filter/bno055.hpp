@@ -1,3 +1,12 @@
+/**
+ * @file bno055.hpp
+ * @author Sharwin Patil (sharwinpatil@u.northwestern.edu)
+ * @brief Header file containing class definition for BNO055 that interfaces
+ * with the BNO055 IMU sensor over I2C.
+ * @date 2025-03-18
+ *
+ */
+
 #ifndef _BNO055_HPP_
 #define _BNO055_HPP_
 
@@ -15,13 +24,13 @@
 
 #include "bno055_registers.hpp"
 
-/**
- * @brief Struct for storing the BNO055 sensor data
- *
- * @note The order of this struct is designed to match the I2C registers
- * so all data can be read in one fell swoop
- *
- */
+ /**
+  * @brief Struct for storing the BNO055 sensor data
+  *
+  * @note The order of this struct is designed to match the I2C registers
+  * so all data can be read in one fell swoop
+  *
+  */
 typedef struct {
   int16_t raw_linear_acceleration_x; /** @brief Raw Linear Accel X */
   int16_t raw_linear_acceleration_y; /** @brief Raw Linear Accel Y */
