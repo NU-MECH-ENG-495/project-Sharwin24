@@ -100,7 +100,7 @@ void KalmanFilter::timerCallback() {
   // |EE.Z| + TOF = H (EE.Z should be a negative number so we take the absolute value)
   float eeZ = this->latestConfig.end_effector_position.z;
   float tof = this->rangeFilter.estimate * 1000; // Convert to mm
-  float error = this->H - (std::abs(eeZ) + tof);
+  float error = this->H - (eeZ + tof);
   auto error_msg = Float32();
   error_msg.data = error;
   this->filtered_range_error_pub->publish(error_msg);
