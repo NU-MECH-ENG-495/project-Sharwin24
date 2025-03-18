@@ -72,7 +72,7 @@ endif()
 
 # Building documentation should be optional.
 # To build documentation pass -DBUILD_DOCS=ON when generating the build system
-option(BUILD_DOCS "Build documentation" ON)
+option(BUILD_DOCS "Build documentation" OFF)
 
 if(${DOXYGEN_FOUND} AND ${BUILD_DOCS})
   # Turn the README.md into the homepage of the doxygen docs
