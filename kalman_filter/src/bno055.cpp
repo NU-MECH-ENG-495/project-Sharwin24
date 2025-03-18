@@ -1,14 +1,19 @@
-/* BNO055.cpp
- * Author: Dheera Venkatraman <dheera@dheera.net>
+/**
+ * @file bno055.cpp
+ * @brief Implementation of the BNO055 sensor interface.
  *
- * Modified by Sharwin Patil
+ * This file contains the implementation of the BNO055 sensor interface,
+ * including initialization, reset, and data reading functions.
+ *
+ * @author Dheera Venkatraman <dheera@dheera.net>
+ * @note This file was modified by Sharwin Patil
+ * @date 2023-03-18
  */
 
 
 #include "bno055.hpp"
 #include "bno055_registers.hpp"
 #include "smbus_functions.h"
-
 
 bool BNO055::reset() {
   _i2c_smbus_write_byte_data(this->file, BNO055_OPR_MODE_ADDR, BNO055_OPERATION_MODE_CONFIG);

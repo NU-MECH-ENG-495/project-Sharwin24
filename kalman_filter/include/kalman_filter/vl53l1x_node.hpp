@@ -17,7 +17,7 @@ public:
 
 private:
   VL53L1X sensor;
-  
+  rclcpp::TimerBase::SharedPtr timer;
   rclcpp::Publisher<sensor_msgs::msg::Range>::SharedPtr sensor_pub;
 };
 

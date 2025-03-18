@@ -38,46 +38,46 @@ BNO055Node::BNO055Node() : Node("BNO055_Sensor") {
     imu_topic.c_str(), mag_topic.c_str(), temp_topic.c_str(), sensor_freq);
 
   // Create a timer with a 100ms period to read and publish
-  auto timer = this->create_wall_timer(
-    std::chrono::duration<double>(1.0 / sensor_freq), // [s]
+  this->timer = this->create_wall_timer(
+    std::chrono::milliseconds(static_cast<int>(1000.0 / sensor_freq)),
     [this]() -> void {
-      IMURecord record = this->sensor.read();
-      const std::string sensor_frame_id = "BNO055_frame";
+    IMURecord record = this->sensor.read();
+    const std::string sensor_frame_id = "BNO055_frame";
 
-      // IMU data
-      sensor_msgs::msg::Imu imu_msg;
-      imu_msg.header.stamp = this->now();
-      imu_msg.header.frame_id = sensor_frame_id;
-      imu_msg.linear_acceleration.x = record.raw_linear_acceleration_x;
-      imu_msg.linear_acceleration.y = record.raw_linear_acceleration_y;
-      imu_msg.linear_acceleration.z = record.raw_linear_acceleration_z;
-      imu_msg.angular_velocity.x = record.raw_angular_velocity_x;
-      imu_msg.angular_velocity.y = record.raw_angular_velocity_y;
-      imu_msg.angular_velocity.z = record.raw_angular_velocity_z;
-      imu_msg.orientation.w = record.fused_orientation_w;
-      imu_msg.orientation.x = record.fused_orientation_x;
-      imu_msg.orientation.y = record.fused_orientation_y;
-      imu_msg.orientation.z = record.fused_orientation_z;
+    // IMU data
+    sensor_msgs::msg::Imu imu_msg;
+    imu_msg.header.stamp = this->now();
+    imu_msg.header.frame_id = sensor_frame_id;
+    imu_msg.linear_acceleration.x = record.raw_linear_acceleration_x;
+    imu_msg.linear_acceleration.y = record.raw_linear_acceleration_y;
+    imu_msg.linear_acceleration.z = record.raw_linear_acceleration_z;
+    imu_msg.angular_velocity.x = record.raw_angular_velocity_x;
+    imu_msg.angular_velocity.y = record.raw_angular_velocity_y;
+    imu_msg.angular_velocity.z = record.raw_angular_velocity_z;
+    imu_msg.orientation.w = record.fused_orientation_w;
+    imu_msg.orientation.x = record.fused_orientation_x;
+    imu_msg.orientation.y = record.fused_orientation_y;
+    imu_msg.orientation.z = record.fused_orientation_z;
 
-      // Magnetic field data
-      sensor_msgs::msg::MagneticField mag_msg;
-      mag_msg.header.stamp = this->now();
-      mag_msg.header.frame_id = sensor_frame_id;
-      mag_msg.magnetic_field.x = record.raw_magnetic_field_x;
-      mag_msg.magnetic_field.y = record.raw_magnetic_field_y;
-      mag_msg.magnetic_field.z = record.raw_magnetic_field_z;
+    // Magnetic field data
+    sensor_msgs::msg::MagneticField mag_msg;
+    mag_msg.header.stamp = this->now();
+    mag_msg.header.frame_id = sensor_frame_id;
+    mag_msg.magnetic_field.x = record.raw_magnetic_field_x;
+    mag_msg.magnetic_field.y = record.raw_magnetic_field_y;
+    mag_msg.magnetic_field.z = record.raw_magnetic_field_z;
 
-      // Temperature data
-      sensor_msgs::msg::Temperature temp_msg;
-      temp_msg.header.stamp = this->now();
-      temp_msg.header.frame_id = sensor_frame_id;
-      temp_msg.temperature = record.temperature;
+    // Temperature data
+    sensor_msgs::msg::Temperature temp_msg;
+    temp_msg.header.stamp = this->now();
+    temp_msg.header.frame_id = sensor_frame_id;
+    temp_msg.temperature = record.temperature;
 
-      // Publish the data
-      this->imu_pub->publish(imu_msg);
-      this->mag_pub->publish(mag_msg);
-      this->temp_pub->publish(temp_msg);
-    }
+    // Publish the data
+    this->imu_pub->publish(imu_msg);
+    this->mag_pub->publish(mag_msg);
+    this->temp_pub->publish(temp_msg);
+  }
   );
 }
 

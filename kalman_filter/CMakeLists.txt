@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(kalman_filter)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -7,9 +9,9 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(Doxygen)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(Doxygen)
 
 include_directories(
   include/kalman_filter
@@ -24,8 +26,8 @@ add_executable(VL53L1X_Sensor src/vl53l1x_node.cpp src/vl53l1x.cpp)
 ament_target_dependencies(VL53L1X_Sensor rclcpp sensor_msgs)
 
 # Kalman Filter Node
-add_executable(kalman_filter src/kalman.cpp)
-ament_target_dependencies(kalman_filter rclcpp sensor_msgs)
+add_executable(kalman src/kalman.cpp)
+ament_target_dependencies(kalman rclcpp sensor_msgs)
 
 install(TARGETS
   VL53L1X_Sensor
@@ -38,7 +40,7 @@ install(TARGETS
 )
 
 install(TARGETS
-  kalman_filter
+  kalman
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -66,6 +68,21 @@ if(BUILD_TESTING)
   # a copyright and license is added to all source files
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
+endif()
+
+# Building documentation should be optional.
+# To build documentation pass -DBUILD_DOCS=ON when generating the build system
+option(BUILD_DOCS "Build documentation" ON)
+
+if(${DOXYGEN_FOUND} AND ${BUILD_DOCS})
+  # Turn the README.md into the homepage of the doxygen docs
+  set(DOXYGEN_USE_MDFILE_AS_MAINPAGE ../README.md)
+
+  # Tell Doxygen where to find the documentation
+  doxygen_add_docs(doxygen include/ src/ ../README.md ALL)
+
+  # The documentation will be in the build/html directory
+  # The main page is build/html/index.html
 endif()
 
 ament_package()

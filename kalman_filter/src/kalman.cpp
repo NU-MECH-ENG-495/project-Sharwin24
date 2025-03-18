@@ -15,7 +15,7 @@ typedef struct {
   float z_ddot; // z acceleration of the end effector [mm/s^2]
 } StateVector;
 
-KalmanFilter::KalmanFilter() : Node("kalman_filter") {
+KalmanFilter::KalmanFilter() : Node("kalman") {
   // Declare parameters
   float timer_freq = this->declare_parameter("timer_frequency", 100.0); // [Hz]
   this->H = this->declare_parameter("ground_to_base_height", 400.0); // [mm]
@@ -30,6 +30,10 @@ KalmanFilter::KalmanFilter() : Node("kalman_filter") {
   this->rangeFilter.beta = this->get_parameter("range_filter_beta").as_double();
   this->tempFilter.alpha = this->get_parameter("temp_filter_alpha").as_double();
   this->tempFilter.beta = this->get_parameter("temp_filter_beta").as_double();
+
+  // Initialize time for the filters
+  this->rangeFilter.prevMeasureTime = this->now();
+  this->tempFilter.prevMeasureTime = this->now();
 
   // Raw data Topics
   const std::string imu_raw_topic = "bno055/raw_imu";
@@ -63,31 +67,44 @@ KalmanFilter::KalmanFilter() : Node("kalman_filter") {
   this->filtered_temp_pub = this->create_publisher<Temp>(temp_filtered_topic, filteredQos);
   this->filtered_range_pub = this->create_publisher<Range>(range_filtered_topic, filteredQos);
 
+  // Log topics being used
   RCLCPP_INFO(this->get_logger(), "Kalman Filter subscribing to raw data on topics: (%s), (%s), (%s), (%s)",
     imu_raw_topic.c_str(), mag_raw_topic.c_str(), temp_raw_topic.c_str(), range_raw_topic.c_str()
   );
-
   RCLCPP_INFO(this->get_logger(), "Kalman Filter publishing filtered data on topics: (%s), (%s), (%s), (%s)",
     imu_filtered_topic.c_str(), mag_filtered_topic.c_str(), temp_filtered_topic.c_str(), range_filtered_topic.c_str()
   );
 
-  // Create a timer to run the filter
-  auto timer = this->create_wall_timer(
-    std::chrono::duration<double>(1.0 / timer_freq), // [s]
-    [this]() -> void {
-      // Run the Kalman Filter
-    }
+  // Log filter parameters
+  RCLCPP_INFO(this->get_logger(), "Alpha-Beta Filter Parameters: Range (alpha=%.2f, beta=%.2f), Temp (alpha=%.2f, beta=%.2f)",
+    this->rangeFilter.alpha, this->rangeFilter.beta, this->tempFilter.alpha, this->tempFilter.beta
   );
+
+  // Create a timer to run the filter
+  // auto timer = this->create_wall_timer(
+  //   std::chrono::duration<double>(1.0 / timer_freq), // [s]
+  //   [this]() -> void {
+  //     // Run the Kalman Filter
+  //   }
+  // );
 }
 
 void KalmanFilter::applyAlphaBetaFilter(float z, AlphaBetaFilter& filter) {
+  // Handle first measurement case
+  if (filter.previousEstimate == 0 && filter.previousRateEstimate == 0) {
+    filter.prevMeasureTime = this->now();
+    filter.previousEstimate = z;
+    filter.estimate = z; // Use current measurement as the initial estimate
+    return; // Skip prediction for first measurement
+  }
+
   // Update Timestep and save the previous measurement time
   float dt = (this->now() - filter.prevMeasureTime).seconds();
   filter.prevMeasureTime = this->now();
 
   // Prediction Step
   filter.estimate = filter.previousEstimate + (filter.rateEstimate * dt);
-  
+
   // Update Step
   float residual = z - filter.estimate;
   filter.estimate += filter.alpha * residual;
@@ -108,10 +125,6 @@ void KalmanFilter::magCallback(const MagField::SharedPtr msg) {
 
 void KalmanFilter::tempCallback(const Temp::SharedPtr msg) {
   // Alpha-Beta Filter for Temperature data from BNO055 Sensor
-  if (this->tempFilter.previousEstimate == 0 && this->tempFilter.previousRateEstimate == 0) {
-    this->tempFilter.previousEstimate = msg->temperature; // Initial Guess
-  }
-
   this->applyAlphaBetaFilter(msg->temperature, this->tempFilter);
 
   // Publish the filtered temperature value
@@ -123,10 +136,6 @@ void KalmanFilter::tempCallback(const Temp::SharedPtr msg) {
 
 void KalmanFilter::rangeCallback(const Range::SharedPtr msg) {
   // Alpha-Beta Filter for Range Data from Time-of-Flight Sensor
-  if (this->rangeFilter.previousEstimate == 0 && this->rangeFilter.previousRateEstimate == 0) {
-    this->rangeFilter.previousEstimate = msg->range; // Initial Guess
-  }
-
   this->applyAlphaBetaFilter(msg->range, this->rangeFilter);
 
   // Publish the filtered range value
@@ -139,7 +148,7 @@ void KalmanFilter::rangeCallback(const Range::SharedPtr msg) {
   }
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<KalmanFilter>());
   rclcpp::shutdown();
