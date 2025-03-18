@@ -82,7 +82,7 @@ if(${DOXYGEN_FOUND} AND ${BUILD_DOCS})
   # set(DOXYGEN_USE_MDFILE_AS_MAINPAGE ../README.md)
 
   # Tell Doxygen where to find the documentation
-  doxygen_add_docs(doxygen include/ ALL)
+  doxygen_add_docs(doxygen ${PROJECT_SOURCE_DIR}/include/ ALL)
 
   # The documentation will be in the build/html directory
   # The main page is build/html/index.html

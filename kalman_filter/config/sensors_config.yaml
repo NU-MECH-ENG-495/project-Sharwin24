@@ -11,7 +11,7 @@ kalman:
     timer_frequency: 100.0 # [Hz]
     ground_to_base_height: 400.81087 # [mm]
     tof_offset_mm: 8.17 # [mm]
-    range_filter_alpha: 0.2
-    range_filter_beta: 0.001
+    range_filter_alpha: 0.15
+    range_filter_beta: 0.005
     temp_filter_alpha: 0.8
     temp_filter_beta: 0.01
