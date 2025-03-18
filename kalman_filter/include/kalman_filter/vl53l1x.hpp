@@ -105,10 +105,10 @@ public:
    *
    */
   struct RangingData {
-    uint16_t range_mm; // range reading in millimeters
-    RangeStatus range_status; // The status of the range reading
-    float peak_signal_count_rate_MCPS; // peak signal count rate in MCPS
-    float ambient_count_rate_MCPS; // ambient count rate in MCPS
+    uint16_t range_mm; /** @brief range reading in millimeters */
+    RangeStatus range_status; /** @brief  The status of the range reading */
+    float peak_signal_count_rate_MCPS; /** @brief peak signal count rate in MCPS */
+    float ambient_count_rate_MCPS; /** @brief ambient count rate in MCPS */
   };
 
   /**

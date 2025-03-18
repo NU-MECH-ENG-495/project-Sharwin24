@@ -23,35 +23,35 @@
  *
  */
 typedef struct {
-  int16_t raw_linear_acceleration_x;
-  int16_t raw_linear_acceleration_y;
-  int16_t raw_linear_acceleration_z;
-  int16_t raw_magnetic_field_x;
-  int16_t raw_magnetic_field_y;
-  int16_t raw_magnetic_field_z;
-  int16_t raw_angular_velocity_x;
-  int16_t raw_angular_velocity_y;
-  int16_t raw_angular_velocity_z;
-  int16_t fused_heading;
-  int16_t fused_roll;
-  int16_t fused_pitch;
-  int16_t fused_orientation_w;
-  int16_t fused_orientation_x;
-  int16_t fused_orientation_y;
-  int16_t fused_orientation_z;
-  int16_t fused_linear_acceleration_x;
-  int16_t fused_linear_acceleration_y;
-  int16_t fused_linear_acceleration_z;
-  int16_t gravity_vector_x;
-  int16_t gravity_vector_y;
-  int16_t gravity_vector_z;
-  int8_t temperature;
-  uint8_t calibration_status;
-  uint8_t self_test_result;
-  uint8_t interrupt_status;
-  uint8_t system_clock_status;
-  uint8_t system_status;
-  uint8_t system_error_code;
+  int16_t raw_linear_acceleration_x; /** @brief Raw Linear Accel X */
+  int16_t raw_linear_acceleration_y; /** @brief Raw Linear Accel Y */
+  int16_t raw_linear_acceleration_z; /** @brief Raw Linear Accel Z */
+  int16_t raw_magnetic_field_x; /** @brief Raw Magnetic Field X */
+  int16_t raw_magnetic_field_y; /** @brief Raw Magnetic Field Y */
+  int16_t raw_magnetic_field_z; /** @brief Raw Magnetic Field Z */
+  int16_t raw_angular_velocity_x; /** @brief Raw Angular Velocity X */
+  int16_t raw_angular_velocity_y; /** @brief Raw Angular Velocity Y */
+  int16_t raw_angular_velocity_z; /** @brief Raw Angular Velocity Z */
+  int16_t fused_heading; /** @brief Heading obtained from sensor fusion */
+  int16_t fused_roll; /** @brief Roll obtained from sensor fusion */
+  int16_t fused_pitch; /** @brief Pitch obtained from sensor fusion */
+  int16_t fused_orientation_w; /** @brief W component of the quaternion obtained from sensor fusion */
+  int16_t fused_orientation_x; /** @brief X component of the quaternion obtained from sensor fusion */
+  int16_t fused_orientation_y; /** @brief Y component of the quaternion obtained from sensor fusion */
+  int16_t fused_orientation_z; /** @brief Z component of the quaternion obtained from sensor fusion */
+  int16_t fused_linear_acceleration_x; /** @brief Linear Accel X obtained from sensor fusion */
+  int16_t fused_linear_acceleration_y; /** @brief Linear Accel Y obtained from sensor fusion */
+  int16_t fused_linear_acceleration_z; /** @brief Linear Accel Z obtained from sensor fusion */
+  int16_t gravity_vector_x; /** @brief Gravity Vector X */
+  int16_t gravity_vector_y; /** @brief Gravity Vector Y */
+  int16_t gravity_vector_z; /** @brief Gravity Vector Z */
+  int8_t temperature; /** @brief Temperature [C] */
+  uint8_t calibration_status; /** @brief Calibration status */
+  uint8_t self_test_result; /** @brief Self test result */
+  uint8_t interrupt_status; /** @brief Interrupt status */
+  uint8_t system_clock_status; /** @brief System clock status */
+  uint8_t system_status; /** @brief System status */
+  uint8_t system_error_code; /** @brief System error code */
 } IMURecord;
 
 /**
