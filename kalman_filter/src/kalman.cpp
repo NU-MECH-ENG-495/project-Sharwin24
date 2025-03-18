@@ -19,6 +19,7 @@ KalmanFilter::KalmanFilter() : Node("kalman") {
   // Declare parameters
   float timer_freq = this->declare_parameter("timer_frequency", 100.0); // [Hz]
   this->H = this->declare_parameter("ground_to_base_height", 400.0); // [mm]
+  this->tofOffsetMM = this->declare_parameter("tof_offset_mm", 0.0); // [mm]
   this->rangeFilter.alpha = this->declare_parameter("range_filter_alpha", 0.1);
   this->rangeFilter.beta = this->declare_parameter("range_filter_beta", 0.01);
   this->tempFilter.alpha = this->declare_parameter("temp_filter_alpha", 0.1);
@@ -30,6 +31,7 @@ KalmanFilter::KalmanFilter() : Node("kalman") {
   this->rangeFilter.beta = this->get_parameter("range_filter_beta").as_double();
   this->tempFilter.alpha = this->get_parameter("temp_filter_alpha").as_double();
   this->tempFilter.beta = this->get_parameter("temp_filter_beta").as_double();
+  this->tofOffsetMM = this->get_parameter("tof_offset_mm").as_double();
 
   // Initialize time for the filters
   this->rangeFilter.prevMeasureTime = this->now();
@@ -99,10 +101,10 @@ void KalmanFilter::timerCallback() {
   // Assumming that Kinematics is our "truth", we can estimate the error of the range filter
   // |EE.Z| + TOF = H (EE.Z should be a negative number so we take the absolute value)
   float eeZ = this->latestConfig.end_effector_position.z;
-  float tof = this->rangeFilter.estimate * 1000; // Convert to mm
-  float error = this->H - (eeZ + tof);
+  float tof = (this->rangeFilter.estimate * 1000) + this->tofOffsetMM; // Convert to mm
+  float error = this->H - (std::abs(eeZ) + tof);
   auto error_msg = Float32();
-  error_msg.data = error;
+  error_msg.data = error / 1000; // Convert back to meters for plotting
   this->filtered_range_error_pub->publish(error_msg);
 }
 

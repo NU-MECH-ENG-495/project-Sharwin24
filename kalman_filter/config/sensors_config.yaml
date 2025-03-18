@@ -6,11 +6,12 @@ tof_sensor:
 imu_sensor:
   ros__parameters:
     sensor_frequency: 100.0 # [Hz]
-kalman_filter:
+kalman:
   ros__parameters:
     timer_frequency: 100.0 # [Hz]
     ground_to_base_height: 400.81087 # [mm]
+    tof_offset_mm: 8.17 # [mm]
     range_filter_alpha: 0.2
-    range_filter_beta: 0.01
-    temp_filter_alpha: 0.9
+    range_filter_beta: 0.001
+    temp_filter_alpha: 0.8
     temp_filter_beta: 0.01

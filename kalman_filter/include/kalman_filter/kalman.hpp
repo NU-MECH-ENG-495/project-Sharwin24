@@ -83,7 +83,8 @@ private:
   float H; // Height from the ground to the fixed base of the robot [mm]
   AlphaBetaFilter rangeFilter; // Alpha-beta filter for range data
   AlphaBetaFilter tempFilter; // Alpha-beta filter for temperature data
-  RobotConfig latestConfig;
+  RobotConfig latestConfig; // Latest robot configuration data
+  float tofOffsetMM; // Z Offset of the time of flight sensor from the EE Point [mm]
 
   /**
    * @brief Timer callback for running kalman filter.
