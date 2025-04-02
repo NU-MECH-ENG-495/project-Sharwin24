@@ -55,3 +55,4 @@ The [VL53L1X ToF Sensor](https://www.adafruit.com/product/3967) is capable of pr
 - https://www.cs.unc.edu/~welch/media/pdf/kalman_intro.pdf
 - https://groups.seas.harvard.edu/courses/cs281/papers/unscented.pdf
 - https://www.kalmanfilter.net/default.aspx
+- https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python
