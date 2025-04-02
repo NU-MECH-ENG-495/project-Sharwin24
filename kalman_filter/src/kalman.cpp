@@ -66,10 +66,7 @@ KalmanFilter::KalmanFilter() : Node("kalman") {
   this->raw_range_sub = this->create_subscription<Range>(
     range_raw_topic, rawDataQoS, std::bind(&KalmanFilter::rangeCallback, this, std::placeholders::_1));
   this->robot_config_sub = this->create_subscription<RobotConfig>(robot_config_topic, rawDataQoS,
-    [this](const RobotConfig::SharedPtr msg) -> void {
-    this->latestConfig = *msg;
-  }
-  );
+    [this](const RobotConfig::SharedPtr msg) -> void {this->latestConfig = *msg;});
 
   // Initialize Publishers
   this->filtered_imu_pub = this->create_publisher<IMU>(imu_filtered_topic, filteredDataQoS);
@@ -97,6 +94,7 @@ KalmanFilter::KalmanFilter() : Node("kalman") {
     std::bind(&KalmanFilter::timerCallback, this)
   );
 }
+
 void KalmanFilter::timerCallback() {
   // Assumming that Kinematics is our "truth", we can estimate the error of the range filter
   // |EE.Z| + TOF = H (EE.Z should be a negative number so we take the absolute value)
